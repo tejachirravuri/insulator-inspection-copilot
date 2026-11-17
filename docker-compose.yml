@@ -1,0 +1,31 @@
+# One command to run everything locally:  docker compose up --build
+services:
+  db:
+    # Official PostgreSQL image with the pgvector extension preinstalled.
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: copilot
+      POSTGRES_PASSWORD: copilot  # local development only
+      POSTGRES_DB: copilot
+    ports:
+      - "5432:5432"  # exposed so tests and scripts on the host can reach it
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U copilot -d copilot"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+asyncpg://copilot:copilot@db:5432/copilot
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy  # wait until Postgres accepts connections
+
+volumes:
+  pgdata:

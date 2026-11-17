@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# Secrets: never commit real keys
+.env
+
+# Model weights and images: not published (licence / thesis publication not cleared)
+*.pt
+*.onnx
+data/images/
+data/raw/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

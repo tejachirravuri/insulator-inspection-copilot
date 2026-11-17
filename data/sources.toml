@@ -1,0 +1,31 @@
+# Knowledge-base manifest. Only this file is committed, not the PDFs.
+# All documents are works of the US federal government and therefore in the public domain
+# in the United States (17 U.S.C. 105). They are fetched from the University of North Texas
+# web archive of the original .gov sites. `sha256` pins the exact file that was evaluated.
+# FIST 3-26 is not listed separately: it is contained verbatim in the 3-18..3-28 compilation,
+# and duplicate text would distort retrieval evaluation.
+
+[[document]]
+key = "tm5_684"
+first_content_page = 13  # earlier pages: cover, contents (keyword noise)
+title = "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)"
+url = "https://webarchive.library.unt.edu/web/20121021081948id_/http://armypubs.army.mil/eng/DR_pubs/dr_a/pdf/tm5_684.pdf"
+license = "Public domain (US federal government work, 17 U.S.C. 105)"
+sha256 = "b993175c2ca6c89dab71271b21602402a9abc982466131cf814d8a017802e6c9"
+
+[[document]]
+key = "fist3_18"
+first_content_page = 3  # earlier pages: cover, contents (keyword noise)
+title = "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators"
+url = "https://webarchive.library.unt.edu/eot2008/20090118031251id_/http://www.usbr.gov/power/data/fist/fist3_18/vol3-18.pdf"
+license = "Public domain (US federal government work, 17 U.S.C. 105)"
+sha256 = "83ea0c18483447a5bc1deebd4455217f4ff9dbd3a5d39932c4d940cc7835c538"
+
+
+[[document]]
+key = "fist4_1b"
+first_content_page = 15  # earlier pages: cover, contents (keyword noise)
+title = "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)"
+url = "https://webarchive.library.unt.edu/eot2008/20081006040314id_/http://www.usbr.gov/power/data/fist/fist4_1b/fist4_1b_dec2005.pdf"
+license = "Public domain (US federal government work, 17 U.S.C. 105)"
+sha256 = "68aad801fc4e3f41254bb2eda69c1bfd40a1bfc765e03376b6e63b3dad590dbc"
