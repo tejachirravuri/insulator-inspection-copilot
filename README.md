@@ -173,7 +173,8 @@ managed identity (AcrPull, no registry password), PostgreSQL Flexible Server wit
 Container Apps scaling to zero. Secrets are Container Apps secrets. A public URL is protected by
 an access code and a daily Claude budget ($1/day) enforced from a usage table.
 `infra/deploy.sh` creates the resources, `infra/release.sh` builds, pushes and switches the app.
-The live demo runs in the EU (app: Sweden Central, database: France Central); access code on
+The live demo runs in the EU (app: Sweden Central, database: France Central):
+<https://inspcopilot-app.jollyisland-3702547f.swedencentral.azurecontainerapps.io>, access code on
 request. What went wrong during deployment and how it was solved is in the
 [walkthrough](docs/WALKTHROUGH.md#5-deployment-on-azure).
 
