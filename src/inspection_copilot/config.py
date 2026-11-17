@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     llm_model: str = "claude-opus-5-5"
     agent_effort: str = "medium"  # low | medium | high: thinking depth and token spend
     agent_max_steps: int = 8  # hard cap on tool-calling rounds per question
+    daily_llm_budget_usd: float = 1.0  # AI features pause for the day once this is spent
+
+    # If set, every /api call needs this code (header X-Access-Code). Protects the API key's
+    # credit on a public URL; share the code with people who should try the demo.
+    access_code: SecretStr | None = None
 
     # YOLO weights (not in Git) and uploaded images.
     preload_models: bool = True  # load the embedding model at server start

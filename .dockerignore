@@ -7,4 +7,11 @@
 .ruff_cache
 tests
 data
-*.pt
+jobhunt
+.claude
+docs
+eval
+scripts
+infra
+*.md
+!README.md

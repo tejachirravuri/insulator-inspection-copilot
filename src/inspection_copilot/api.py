@@ -1,21 +1,40 @@
-"""REST API: inspections (upload, detect, review, report), chat with the agent, statistics."""
+"""REST API: inspections (upload, detect, review, report), chat with the agent, statistics.
 
-import asyncio
+Protection for a public deployment:
+  * optional access code (setting ACCESS_CODE): every /api call must send it, as the
+    X-Access-Code header or, for <img> tags that cannot send headers, a `code` query parameter;
+  * daily LLM budget (DAILY_LLM_BUDGET_USD): AI endpoints return 429 once it is used up.
+"""
+
+import secrets
 from dataclasses import asdict
-from pathlib import Path
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from inspection_copilot import agent, services
+from inspection_copilot.config import get_settings
 from inspection_copilot.db import get_session
 from inspection_copilot.llm import MissingApiKeyError
-from inspection_copilot.models import Image
 
-router = APIRouter(prefix="/api")
+
+async def require_access(
+    x_access_code: Annotated[str | None, Header()] = None,
+    code: Annotated[str | None, Query()] = None,
+) -> None:
+    expected = get_settings().access_code
+    if expected is None or not expected.get_secret_value():
+        return  # open (local development)
+    given = x_access_code or code or ""
+    # compare_digest: constant-time comparison, so the code cannot be guessed by timing.
+    if not secrets.compare_digest(given.encode(), expected.get_secret_value().encode()):
+        raise HTTPException(status_code=401, detail="access code required")
+
+
+router = APIRouter(prefix="/api", dependencies=[Depends(require_access)])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 MAX_UPLOAD_BYTES = 15 * 1024 * 1024
 ALLOWED_TYPES = {"image/jpeg", "image/png"}
@@ -44,8 +63,17 @@ def _agent_payload(result: agent.AgentAnswer) -> dict:
     }
 
 
-def _llm_unavailable(exc: Exception) -> HTTPException:
-    return HTTPException(status_code=503, detail=f"LLM unavailable: {exc}")
+def _http_error(exc: Exception) -> HTTPException:
+    if isinstance(exc, services.NotFoundError):
+        return HTTPException(status_code=404, detail=str(exc))
+    if isinstance(exc, services.BudgetExceededError):
+        return HTTPException(status_code=429, detail=str(exc))
+    if isinstance(exc, MissingApiKeyError):
+        return HTTPException(status_code=503, detail=f"LLM unavailable: {exc}")
+    return HTTPException(status_code=500, detail="internal error")
+
+
+HANDLED = (services.NotFoundError, services.BudgetExceededError, MissingApiKeyError)
 
 
 @router.post("/inspections")
@@ -75,28 +103,25 @@ async def list_inspections(session: SessionDep) -> list[dict]:
 async def get_inspection(session: SessionDep, image_id: int) -> dict:
     try:
         return await services.image_detail(session, image_id)
-    except services.NotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except HANDLED as exc:
+        raise _http_error(exc) from exc
 
 
 @router.get("/inspections/{image_id}/image")
-async def get_inspection_image(session: SessionDep, image_id: int) -> FileResponse:
-    image = await session.get(Image, image_id)
-    if image is None or not image.storage_path:
-        raise HTTPException(status_code=404, detail="image not found")
-    if not await asyncio.to_thread(Path(image.storage_path).exists):
-        raise HTTPException(status_code=404, detail="image file missing")
-    return FileResponse(image.storage_path)
+async def get_inspection_image(session: SessionDep, image_id: int) -> Response:
+    try:
+        data, media_type = await services.image_bytes(session, image_id)
+    except HANDLED as exc:
+        raise _http_error(exc) from exc
+    return Response(content=data, media_type=media_type)
 
 
 @router.post("/inspections/{image_id}/review")
 async def review_inspection(session: SessionDep, image_id: int) -> dict:
     try:
         result = await services.review_image(session, image_id)
-    except services.NotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-    except MissingApiKeyError as exc:
-        raise _llm_unavailable(exc) from exc
+    except HANDLED as exc:
+        raise _http_error(exc) from exc
     return {"review": result, "inspection": await services.image_detail(session, image_id)}
 
 
@@ -104,25 +129,34 @@ async def review_inspection(session: SessionDep, image_id: int) -> dict:
 async def report(session: SessionDep, image_id: int) -> dict:
     try:
         await services.image_detail(session, image_id)  # 404 before spending tokens
+        await services.ensure_budget(session)
         result = await agent.write_report(session, image_id)
-    except services.NotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-    except MissingApiKeyError as exc:
-        raise _llm_unavailable(exc) from exc
+    except HANDLED as exc:
+        raise _http_error(exc) from exc
+    await services.record_usage(
+        session, "report", result.model, result.input_tokens, result.output_tokens
+    )
     return _agent_payload(result)
 
 
 @router.post("/chat")
 async def chat(session: SessionDep, request: ChatRequest) -> dict:
     try:
+        await services.ensure_budget(session)
         result = await agent.ask(
             session, request.question, [t.model_dump() for t in request.history]
         )
-    except MissingApiKeyError as exc:
-        raise _llm_unavailable(exc) from exc
+    except HANDLED as exc:
+        raise _http_error(exc) from exc
+    await services.record_usage(
+        session, "chat", result.model, result.input_tokens, result.output_tokens
+    )
     return _agent_payload(result)
 
 
 @router.get("/stats")
 async def stats(session: SessionDep) -> dict:
-    return await services.fleet_statistics(session)
+    data = await services.fleet_statistics(session)
+    data["llm_spent_today_usd"] = round(await services.spent_today_usd(session), 4)
+    data["llm_daily_budget_usd"] = get_settings().daily_llm_budget_usd
+    return data

@@ -6,15 +6,22 @@ REST endpoints: a tool is a thin wrapper, not a second implementation.
 
 import asyncio
 import hashlib
+from datetime import UTC, datetime
 from pathlib import Path
 
 from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, undefer
 
 from inspection_copilot.config import get_settings
 from inspection_copilot.detection import Box, InsulatorType, Mode, detect
-from inspection_copilot.models import Detection, DetectionReview, DetectionRun, Image
+from inspection_copilot.models import (
+    Detection,
+    DetectionReview,
+    DetectionRun,
+    Image,
+    LlmUsage,
+)
 
 PRICE_PER_MTOK = {  # USD (input, output); used to show cost per request in the UI
     "claude-opus-5-5": (4.0, 20.0),
@@ -28,14 +35,61 @@ def cost_usd(model: str, input_tokens: int, output_tokens: int) -> float:
     return input_tokens * price_in / 1e6 + output_tokens * price_out / 1e6
 
 
-def uploads_dir() -> Path:
-    path = Path(get_settings().uploads_dir)
-    path.mkdir(parents=True, exist_ok=True)
-    return path
-
-
 class NotFoundError(LookupError):
     pass
+
+
+class BudgetExceededError(RuntimeError):
+    pass
+
+
+async def spent_today_usd(session: AsyncSession) -> float:
+    """LLM spend since midnight UTC, from the usage log."""
+    since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+    total = await session.scalar(
+        select(func.coalesce(func.sum(LlmUsage.cost_usd), 0.0)).where(LlmUsage.created_at >= since)
+    )
+    return float(total)
+
+
+async def ensure_budget(session: AsyncSession) -> None:
+    """Raise before an LLM call if today's budget is used up."""
+    limit = get_settings().daily_llm_budget_usd
+    if await spent_today_usd(session) >= limit:
+        raise BudgetExceededError(
+            f"daily AI budget of ${limit:.2f} used up; AI features resume tomorrow (UTC)"
+        )
+
+
+async def record_usage(
+    session: AsyncSession, purpose: str, model: str, input_tokens: int, output_tokens: int
+) -> float:
+    cost = cost_usd(model, input_tokens, output_tokens)
+    session.add(
+        LlmUsage(
+            purpose=purpose,
+            model=model,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            cost_usd=cost,
+        )
+    )
+    await session.commit()
+    return cost
+
+
+async def image_bytes(session: AsyncSession, image_id: int) -> tuple[bytes, str]:
+    """Image content and media type (from the database; legacy rows from a local file)."""
+    image = await session.get(Image, image_id, options=[undefer(Image.data)])
+    if image is None:
+        raise NotFoundError(f"image {image_id} not found")
+    data = image.data
+    if data is None and image.storage_path:
+        data = await asyncio.to_thread(Path(image.storage_path).read_bytes)
+    if data is None:
+        raise NotFoundError(f"image {image_id} has no stored content")
+    media_type = "image/png" if data[:8] == b"\x89PNG\r\n\x1a\n" else "image/jpeg"
+    return data, media_type
 
 
 async def inspect_image(
@@ -50,16 +104,13 @@ async def inspect_image(
     image = await session.scalar(select(Image).where(Image.sha256 == sha))
     outcome = await asyncio.to_thread(detect, image_bytes, insulator_type, mode)
     if image is None:
-        suffix = Path(filename).suffix.lower() or ".jpg"
-        path = uploads_dir() / f"{sha}{suffix}"
-        await asyncio.to_thread(path.write_bytes, image_bytes)
         image = Image(
             filename=Path(filename).name[:500],
             sha256=sha,
             insulator_type=insulator_type,
             width=outcome.width,
             height=outcome.height,
-            storage_path=str(path),
+            data=image_bytes,
         )
         session.add(image)
         await session.flush()
@@ -144,15 +195,13 @@ async def review_image(session: AsyncSession, image_id: int) -> dict:
     """Run the vision second opinion on the latest run's detections and store it."""
     from inspection_copilot.vision import review_boxes
 
-    image = await session.get(Image, image_id)
-    if image is None:
-        raise NotFoundError(f"image {image_id} not found")
+    data, _ = await image_bytes(session, image_id)
     run = await _latest_run(session, image_id)
     if run is None or not run.detections:
         return {"reviewed": 0, "cost_usd": 0.0, "note": "no detections to review"}
+    await ensure_budget(session)
     by_box = {(d.x1, d.y1, d.x2, d.y2): d for d in run.detections}
     boxes = [Box(d.class_name, d.confidence, d.x1, d.y1, d.x2, d.y2) for d in run.detections]
-    data = await asyncio.to_thread(Path(image.storage_path).read_bytes)  # no blocking I/O
     result = await review_boxes(data, boxes)
     per_review_in = result.input_tokens // max(1, len(result.reviews))
     per_review_out = result.output_tokens // max(1, len(result.reviews))
@@ -175,11 +224,10 @@ async def review_image(session: AsyncSession, image_id: int) -> dict:
             )
         )
     await session.commit()
-    return {
-        "reviewed": len(result.reviews),
-        "model": result.model,
-        "cost_usd": round(cost_usd(result.model, result.input_tokens, result.output_tokens), 4),
-    }
+    cost = await record_usage(
+        session, "review", result.model, result.input_tokens, result.output_tokens
+    )
+    return {"reviewed": len(result.reviews), "model": result.model, "cost_usd": round(cost, 4)}
 
 
 async def list_images(session: AsyncSession, limit: int = 50) -> list[dict]:

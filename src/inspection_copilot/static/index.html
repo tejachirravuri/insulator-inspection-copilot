@@ -138,6 +138,10 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const md = s => DOMPurify.sanitize(marked.parse(s || ""));
 let current = null, history = [];
+// Access code for protected deployments: asked once, kept in this browser only.
+const store = { get: k => { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+let accessCode = store.get("accessCode");
 
 const COLORS = { good: "var(--ok)", flagged: "var(--warn)", high: "var(--bad)", none: "var(--accent-2)" };
 function verdict(d) {
@@ -148,11 +152,18 @@ function verdict(d) {
   return { key: "good", label: `${r.condition} · ${r.severity}` };
 }
 
-async function api(path, opts = {}) {
-  const res = await fetch(path, opts);
+async function api(path, opts = {}, retry = true) {
+  const headers = { ...(opts.headers || {}), ...(accessCode ? { "X-Access-Code": accessCode } : {}) };
+  const res = await fetch(path, { ...opts, headers });
+  if (res.status === 401 && retry) {
+    accessCode = (prompt("This demo is protected. Please enter the access code:") || "").trim();
+    store.set("accessCode", accessCode);
+    return api(path, opts, false);
+  }
   if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || res.statusText);
   return res.json();
 }
+const imgUrl = id => `/api/inspections/${id}/image` + (accessCode ? `?code=${encodeURIComponent(accessCode)}` : "");
 
 async function loadList() {
   const rows = await api("/api/inspections");
@@ -180,7 +191,7 @@ async function show(id) {
   const reviewed = d.detections.some(x => x.review);
   $("#viewer").innerHTML = `
     <div class="stage">
-      <img src="/api/inspections/${id}/image" alt="inspection ${id}">
+      <img src="${imgUrl(id)}" alt="inspection ${id}">
       <svg viewBox="0 0 ${d.width} ${d.height}" preserveAspectRatio="none">${boxes}</svg>
     </div>
     <div class="meta">

@@ -19,6 +19,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    LargeBinary,
     String,
     Text,
     false,
@@ -100,7 +101,9 @@ class Image(Base):
     insulator_type: Mapped[str] = mapped_column(String(50))  # glass | porcelain | composite
     width: Mapped[int] = mapped_column(Integer)
     height: Mapped[int] = mapped_column(Integer)
-    storage_path: Mapped[str | None] = mapped_column(String(500))
+    storage_path: Mapped[str | None] = mapped_column(String(500))  # legacy: local file
+    # Image bytes; deferred so listing images does not load every picture.
+    data: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     runs: Mapped[list["DetectionRun"]] = relationship(
@@ -168,3 +171,19 @@ class DetectionReview(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     detection: Mapped[Detection] = relationship(back_populates="reviews")
+
+
+class LlmUsage(Base):
+    """One row per Claude call: the basis for the daily spend cap and cost reporting."""
+
+    __tablename__ = "llm_usage"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+    purpose: Mapped[str] = mapped_column(String(50))
+    model: Mapped[str] = mapped_column(String(100))
+    input_tokens: Mapped[int] = mapped_column(Integer)
+    output_tokens: Mapped[int] = mapped_column(Integer)
+    cost_usd: Mapped[float] = mapped_column(Float)
