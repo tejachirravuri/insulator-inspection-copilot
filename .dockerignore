@@ -6,7 +6,8 @@
 .pytest_cache
 .ruff_cache
 tests
-data
+data/*
+!data/sources.toml
 jobhunt
 .claude
 docs
@@ -15,3 +16,4 @@ scripts
 infra
 *.md
 !README.md
+!demo/images/ATTRIBUTION.md

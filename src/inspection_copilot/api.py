@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from inspection_copilot import agent, services
 from inspection_copilot.config import get_settings
 from inspection_copilot.db import get_session
+from inspection_copilot.detection import WeightsMissingError
 from inspection_copilot.llm import MissingApiKeyError
 
 
@@ -68,12 +69,19 @@ def _http_error(exc: Exception) -> HTTPException:
         return HTTPException(status_code=404, detail=str(exc))
     if isinstance(exc, services.BudgetExceededError):
         return HTTPException(status_code=429, detail=str(exc))
+    if isinstance(exc, WeightsMissingError):
+        return HTTPException(status_code=503, detail=str(exc))
     if isinstance(exc, MissingApiKeyError):
         return HTTPException(status_code=503, detail=f"LLM unavailable: {exc}")
     return HTTPException(status_code=500, detail="internal error")
 
 
-HANDLED = (services.NotFoundError, services.BudgetExceededError, MissingApiKeyError)
+HANDLED = (
+    services.NotFoundError,
+    services.BudgetExceededError,
+    MissingApiKeyError,
+    WeightsMissingError,
+)
 
 
 @router.post("/inspections")
@@ -88,9 +96,12 @@ async def create_inspection(
     data = await file.read(MAX_UPLOAD_BYTES + 1)
     if len(data) > MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="image larger than 15 MB")
-    image_id = await services.inspect_image(
-        session, data, file.filename or "upload.jpg", insulator_type, mode
-    )
+    try:
+        image_id = await services.inspect_image(
+            session, data, file.filename or "upload.jpg", insulator_type, mode
+        )
+    except HANDLED as exc:
+        raise _http_error(exc) from exc
     return await services.image_detail(session, image_id)
 
 

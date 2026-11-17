@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     # YOLO weights (not in Git) and uploaded images.
     preload_models: bool = True  # load the embedding model at server start
     models_dir: str = "models"
+    data_dir: str = "data"  # sources.toml and downloaded PDFs (data/raw)
+    demo_images_dir: str = "demo/images"  # openly licensed images seeded on first start
     uploads_dir: str = "data/uploads"
 
 

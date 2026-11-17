@@ -31,13 +31,17 @@ ENV HF_HUB_OFFLINE=1     YOLO_CONFIG_DIR=/tmp/ultralytics
 # a .gitkeep in CI builds, and the real weights when built from the developer machine into the
 # private Azure Container Registry.
 COPY models ./models
+# Manifest of the public-domain manuals and openly licensed demo images (see ATTRIBUTION.md).
+COPY data/sources.toml ./data/sources.toml
+COPY demo ./demo
 
 COPY alembic.ini ./
 COPY migrations ./migrations
 COPY docker/entrypoint.sh ./entrypoint.sh
 
 # Never run the service as root inside the container.
-RUN useradd --create-home --uid 1000 app && chmod +x ./entrypoint.sh
+RUN useradd --create-home --uid 1000 app && chmod +x ./entrypoint.sh \
+    && mkdir -p data/raw && chown -R app data
 USER app
 
 EXPOSE 8000

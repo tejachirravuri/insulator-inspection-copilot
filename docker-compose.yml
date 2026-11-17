@@ -19,6 +19,10 @@ services:
 
   api:
     build: .
+    # Optional .env for the Claude API key (ANTHROPIC_API_KEY); everything else has defaults.
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql+asyncpg://copilot:copilot@db:5432/copilot
     ports:

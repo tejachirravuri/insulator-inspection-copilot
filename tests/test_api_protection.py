@@ -46,3 +46,22 @@ async def test_chat_is_refused_when_daily_budget_is_spent(client, db_session, mo
     response = await client.post("/api/chat", json={"question": "hello"})
     assert response.status_code == 429
     assert "budget" in response.json()["detail"]
+
+
+async def test_upload_without_yolo_weights_returns_503(client, monkeypatch) -> None:
+    from inspection_copilot import services
+    from inspection_copilot.detection import WeightsMissingError
+
+    monkeypatch.setattr(get_settings(), "access_code", None)
+
+    async def no_weights(*args, **kwargs):
+        raise WeightsMissingError("YOLO weights not available in this deployment: x.pt")
+
+    monkeypatch.setattr(services, "inspect_image", no_weights)
+    response = await client.post(
+        "/api/inspections",
+        files={"file": ("a.jpg", b"\xff\xd8\xff", "image/jpeg")},
+        data={"insulator_type": "glass"},
+    )
+    assert response.status_code == 503
+    assert "weights" in response.json()["detail"]

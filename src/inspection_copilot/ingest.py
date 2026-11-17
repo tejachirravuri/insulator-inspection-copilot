@@ -21,9 +21,37 @@ from inspection_copilot.config import get_settings
 from inspection_copilot.db import get_engine, get_sessionmaker
 from inspection_copilot.models import Chunk, Document
 
-ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = ROOT / "data" / "sources.toml"
-RAW_DIR = ROOT / "data" / "raw"
+
+def manifest_path() -> Path:
+    # Relative to the working directory (repo root locally, /app in the container), not to
+    # this file: in the container the package lives in site-packages.
+    return Path(get_settings().data_dir) / "sources.toml"
+
+
+def raw_dir() -> Path:
+    return Path(get_settings().data_dir) / "raw"
+
+
+def fetch_documents() -> None:
+    """Download the manifest's PDFs into data/raw and verify their SHA-256 hashes."""
+    import hashlib
+    import ssl
+    import urllib.request
+
+    import truststore
+
+    context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    raw_dir().mkdir(parents=True, exist_ok=True)
+    for doc in load_manifest():
+        target = raw_dir() / f"{doc['key']}.pdf"
+        if not target.exists():
+            request = urllib.request.Request(doc["url"], headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(request, timeout=120, context=context) as response:
+                target.write_bytes(response.read())
+        digest = hashlib.sha256(target.read_bytes()).hexdigest()
+        if doc["sha256"] and digest != doc["sha256"]:
+            raise RuntimeError(f"{doc['key']}: SHA-256 mismatch ({digest})")
+        print(f"ok {doc['key']} ({target.stat().st_size} bytes)")
 
 
 def read_pdf_pages(path: Path) -> list[str]:
@@ -33,13 +61,13 @@ def read_pdf_pages(path: Path) -> list[str]:
 
 
 def load_manifest() -> list[dict]:
-    return tomllib.loads(MANIFEST.read_text(encoding="utf-8"))["document"]
+    return tomllib.loads(manifest_path().read_text(encoding="utf-8"))["document"]
 
 
 def build_chunks(max_words: int, overlap_words: int) -> dict[str, tuple[dict, list[ChunkData]]]:
     result = {}
     for doc in load_manifest():
-        pages = read_pdf_pages(RAW_DIR / f"{doc['key']}.pdf")
+        pages = read_pdf_pages(raw_dir() / f"{doc['key']}.pdf")
         # Blank (not remove) front matter so page numbers still match the PDF for citations.
         skip = doc.get("first_content_page", 1) - 1
         pages = [""] * skip + pages[skip:]

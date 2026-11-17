@@ -61,6 +61,10 @@ class DetectionOutcome:
     notes: list[str] = field(default_factory=list)
 
 
+class WeightsMissingError(FileNotFoundError):
+    """The YOLO weights are not available (they are not published with the code)."""
+
+
 def models_dir() -> Path:
     return Path(get_settings().models_dir)
 
@@ -71,7 +75,7 @@ def _load(insulator_type: str, mode: str):
 
     path = models_dir() / MODEL_FILES[(insulator_type, mode)]
     if not path.exists():
-        raise FileNotFoundError(f"model weights not found: {path}")
+        raise WeightsMissingError(f"YOLO weights not available in this deployment: {path.name}")
     model = YOLO(str(path))
     # Warm-up: the first predict call initialises the network and is several seconds slower.
     # Doing it here keeps that one-off cost out of the recorded inference latencies.
