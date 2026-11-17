@@ -76,7 +76,7 @@ def summarise(ranks: list[int | None]) -> dict[str, float]:
     }
 
 
-def check_questions() -> int:
+def check_questions(path: Path = QUESTIONS) -> int:
     """Every evidence quote must occur in a chunk of the right document on the stated page."""
     from inspection_copilot.config import get_settings
     from inspection_copilot.ingest import build_chunks
@@ -84,7 +84,7 @@ def check_questions() -> int:
     settings = get_settings()
     docs = build_chunks(settings.chunk_max_words, settings.chunk_overlap_words)
     problems = 0
-    for q in load_questions():
+    for q in load_questions(path):
         chunks = docs[q.source_key][1]
         matches = [c for c in chunks if normalise(q.evidence) in normalise(c.text)]
         if not matches:
@@ -94,7 +94,7 @@ def check_questions() -> int:
             pages = sorted({(c.page_start, c.page_end) for c in matches})
             print(f"{q.id}: evidence found on pages {pages}, question says {q.page}")
             problems += 1
-    print(f"{problems} problem(s) in {len(load_questions())} questions")
+    print(f"{problems} problem(s) in {len(load_questions(path))} questions")
     return problems
 
 
@@ -108,7 +108,7 @@ def _git_commit() -> str:
         return "unknown"
 
 
-async def run() -> dict:
+async def run(path: Path = QUESTIONS) -> dict:
     from sqlalchemy import func, select
 
     from inspection_copilot.config import get_settings
@@ -118,7 +118,7 @@ async def run() -> dict:
     from inspection_copilot.retrieval import search
 
     settings = get_settings()
-    questions = load_questions()
+    questions = load_questions(path)
     embedder = get_embedder()
     ranks: dict[str, dict[str, int | None]] = defaultdict(dict)
     async with get_sessionmaker()() as session:
@@ -171,12 +171,15 @@ def markdown_table(result: dict) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="validate questions only")
+    parser.add_argument("--questions", type=Path, default=QUESTIONS, help="question set (jsonl)")
+    parser.add_argument("--out", default="retrieval.json", help="file name in eval/results/")
     args = parser.parse_args()
     if args.check:
-        raise SystemExit(1 if check_questions() else 0)
-    result = asyncio.run(run())
+        raise SystemExit(1 if check_questions(args.questions) else 0)
+    result = asyncio.run(run(args.questions))
+    result["question_set"] = args.questions.name
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    out = RESULTS_DIR / "retrieval.json"
+    out = RESULTS_DIR / args.out
     out.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(markdown_table(result))
     print(f"\nwritten to {out.relative_to(ROOT)}")
