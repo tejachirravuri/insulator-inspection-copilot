@@ -27,7 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 QUESTIONS = ROOT / "eval" / "retrieval_questions.jsonl"
 RESULTS_DIR = ROOT / "eval" / "results"
-METHODS = ("keyword", "vector", "hybrid")
+METHODS = ("keyword", "bm25", "vector", "hybrid", "hybrid_bm25")
 TOP_K = 10
 
 

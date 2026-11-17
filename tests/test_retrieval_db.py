@@ -50,3 +50,22 @@ async def test_hybrid_combines_both_lists(db_session, corpus) -> None:
     # Vector prefers chunk 0, keywords prefer chunk 1 ("washing"): both must be returned.
     hits = await search(db_session, "washing", _vec(0), "hybrid", 2)
     assert {h.chunk_id for h in hits} == {corpus[0], corpus[1]}
+
+
+async def test_bm25_prefers_rare_terms_over_repeated_common_ones(db_session) -> None:
+    doc = Document(source_key=f"test-{uuid4()}", title="BM25", license="test")
+    texts = [
+        "test test test test test electrical test procedure test",  # common word repeated
+        "Hot stick electrical test every 2 years.",  # rare, decisive words
+        "Wood poles are inspected for decay.",
+    ]
+    doc.chunks = [
+        Chunk(ordinal=i, page_start=1, page_end=1, text=t, embedding=_vec(i))
+        for i, t in enumerate(texts)
+    ]
+    db_session.add(doc)
+    await db_session.flush()
+    ids = {c.ordinal: c.id for c in doc.chunks}
+
+    hits = await search(db_session, "How often should hot sticks be tested?", None, "bm25", 3)
+    assert hits[0].chunk_id == ids[1]

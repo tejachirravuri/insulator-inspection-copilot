@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from inspection_copilot import services
 from inspection_copilot.db import get_sessionmaker
-from inspection_copilot.retrieval import search
+from inspection_copilot.retrieval import DEFAULT_METHOD, search
 
 INSTRUCTIONS = """Tools for powerline insulator inspection data and maintenance manuals.
 Inspections are drone images where YOLOv8 located insulators; some detections carry a vision-
@@ -46,7 +46,7 @@ async def search_manuals(query: str, top_k: int = 5) -> list[dict[str, Any]]:
     top_k = max(1, min(top_k, 10))
     vector = await asyncio.to_thread(_embed, query)
     async with session_factory() as session:
-        hits = await search(session, query, vector, "hybrid", top_k)
+        hits = await search(session, query, vector, DEFAULT_METHOD, top_k)
     return [
         {
             "document": h.document_title,

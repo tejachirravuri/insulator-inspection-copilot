@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from inspection_copilot import services
 from inspection_copilot.config import get_settings
 from inspection_copilot.llm import get_async_client
-from inspection_copilot.retrieval import search
+from inspection_copilot.retrieval import DEFAULT_METHOD, search
 
 SYSTEM_PROMPT = """You are the Insulator Inspection Copilot, an assistant for powerline \
 inspectors. You work with:
@@ -153,7 +153,7 @@ class _Toolbox:
         from inspection_copilot.embeddings import get_embedder
 
         vector = await asyncio.to_thread(get_embedder().embed_query, query)
-        hits = await search(self.session, query, vector, "hybrid", top_k=5)
+        hits = await search(self.session, query, vector, DEFAULT_METHOD, top_k=5)
         lines = []
         for hit in hits:
             source = Source(

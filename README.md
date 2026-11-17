@@ -47,7 +47,7 @@ flowchart LR
   API --> DET[YOLOv8n / YOLOv8s<br/>auto switching]
   API --> VIS[Claude vision<br/>second opinion]
   API --> AG[Agent loop<br/>Claude + 5 tools]
-  AG --> RET[Hybrid retrieval<br/>vector + keyword, RRF]
+  AG --> RET[Hybrid retrieval<br/>vector + BM25, RRF]
   RET --> PG[(PostgreSQL<br/>pgvector + full-text)]
   API --> PG
   ING[Ingestion<br/>PDF → chunks → E5 embeddings] --> PG
@@ -61,19 +61,32 @@ Design decisions and their reasons: [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md).
 
 All numbers below come from runs in this repository; single runs on one machine unless stated.
 
-**Retrieval** (53 questions with verbatim evidence quotes, 931 chunks, top 10 per method;
-[eval/results/retrieval.json](eval/results/retrieval.json)):
+**Retrieval** (931 chunks, top 10 per method, MRR@10 / Hit@5;
+[eval/results/](eval/results/)):
 
-| Method | Hit@1 | Hit@3 | Hit@5 | MRR@10 |
-|---|---|---|---|---|
-| Keyword (PostgreSQL full-text) | 0.25 | 0.40 | 0.42 | 0.33 |
-| Vector (pgvector, multilingual-e5-small) | 0.38 | 0.55 | 0.66 | 0.50 |
-| Hybrid (Reciprocal Rank Fusion) | **0.42** | **0.57** | 0.64 | **0.51** |
+| Method | Development set (53 q.) | Held-out set (21 q.) |
+|---|---|---|
+| Keyword, PostgreSQL `ts_rank_cd` | 0.33 / 0.42 | 0.27 / 0.48 |
+| Keyword, **BM25 in SQL** | 0.60 / 0.70 | **0.65 / 0.76** |
+| Vector (pgvector, multilingual-e5-small) | 0.50 / 0.66 | 0.61 / 0.67 |
+| Hybrid RRF (vector + `ts_rank_cd`) | 0.51 / 0.64 | 0.57 / 0.67 |
+| **Hybrid RRF (vector + BM25)**, default | **0.62 / 0.81** | 0.61 / 0.76 |
 
-Hybrid ranks the right passage first most often. Keyword search is weak because PostgreSQL's
-`ts_rank_cd` has no inverse document frequency: common words ("test" occurs in 370 of 931
-chunks) outrank rare, decisive ones ("stick": 29). Paraphrased questions are hardest for every
-method (best Hit@5 0.47 on 17 questions).
+How this was measured, in order:
+1. The first evaluation showed weak keyword search. Diagnosis: PostgreSQL's `ts_rank_cd` has no
+   inverse document frequency, so common words ("test" occurs in 370 of 931 chunks) outrank
+   rare, decisive ones ("stick": 29).
+2. **Before** changing anything, 21 new questions on topics the development set does not cover
+   were written and committed (`eval/heldout_questions.jsonl`, see the Git history), together
+   with a decision rule: switch the default only if vector + BM25 beats the old hybrid on
+   **both** sets.
+3. BM25 was implemented in SQL on the existing full-text index with the standard parameters
+   k1 = 1.2, b = 0.75, not tuned. Keyword MRR roughly doubled on both sets and the rule was met.
+
+Caveats: on the held-out set BM25 alone is slightly ahead of the hybrid; with 21 questions a
+difference of 0.04 MRR is about one question. BM25 computes its statistics per query: median
+180 ms per search versus 30 ms for `ts_rank_cd` (20 queries, laptop); precomputed statistics in
+materialized views would remove most of that.
 
 **Detection latency** (CPU, Intel i5-10210U laptop, 10 images, auto mode): fast-only runs
 135-218 ms; runs that escalated to the accurate model 488-583 ms; 3 of 10 images escalated.
@@ -132,7 +145,7 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -e ".[ml,dev]"
 docker compose up -d db
 alembic upgrade head
-pytest                                        # 36 tests; DB tests use a separate test database
+pytest                                        # 37 tests; DB tests use a separate test database
 python -m inspection_copilot.ingest           # manuals into the dev database
 python -m inspection_copilot.eval_retrieval   # retrieval evaluation
 uvicorn inspection_copilot.main:app --reload
@@ -147,6 +160,8 @@ uvicorn inspection_copilot.main:app --reload
   Labelling by quote instead of chunk id keeps the set valid when chunking changes.
 * **Bias control:** questions written from the text favour keyword search, so 17 of them are
   `paraphrase` questions that avoid the source wording; results are reported per category.
+* **Held-out set:** 21 questions on other topics, committed before BM25 was implemented, so
+  the method change could not be tuned to them.
 * **Agent tests** use a scripted fake Claude client (no key, no cost): parallel tool results,
   unknown tools, step cap, refusals. CI runs lint, migrations and all tests against PostgreSQL
   with pgvector and builds the Docker image.
@@ -178,8 +193,7 @@ US ([data/sources.toml](data/sources.toml)). The PDFs are downloaded, not stored
 * The YOLO models localise insulators; they do not classify defects. Condition assessment comes
   from the vision LLM and is an AI second opinion that flags cases for a qualified person.
 * On small or blurry aerial crops the vision review often answers "unclear" by design.
-* The retrieval questions were drafted with an AI assistant; keyword ranking lacks IDF (BM25 is
-  the planned fix, to be measured on a held-out question set).
+* The retrieval questions were drafted with an AI assistant; the held-out set is small (21).
 * PDF extraction sometimes mixes two-column text, so a chunk's section label can be one
   paragraph off.
 * Latency and cost figures are single runs, not benchmarks.

@@ -80,8 +80,15 @@ questions written from the text. *Measured* (`eval/results/retrieval.json`):
 | Hybrid (RRF) | 0.42 | 0.57 | 0.64 | 0.51 |
 
 Diagnosis: PostgreSQL's `ts_rank_cd` has no inverse document frequency, so common words
-("test": 370 of 931 chunks) outrank rare, decisive ones ("stick": 29). BM25 is the planned fix,
-to be checked on a held-out question set written before the change.
+("test": 370 of 931 chunks) outrank rare, decisive ones ("stick": 29).
+
+**Fix, measured honestly:** first 21 held-out questions on new topics were written and committed
+with a decision rule (switch only if vector + BM25 beats the old hybrid on both sets), then BM25
+was implemented in SQL on the same `tsvector` column with standard k1 = 1.2, b = 0.75 (not
+tuned). Results (MRR@10, development / held-out): keyword 0.33 / 0.27 -> BM25 0.60 / 0.65;
+hybrid 0.51 / 0.57 -> hybrid with BM25 0.62 / 0.61. The rule was met, so hybrid + BM25 is the
+default for the agent and the MCP server. Cost: median 180 ms per BM25 search versus 30 ms,
+because corpus statistics are computed per query (materialized views would fix this at scale).
 
 **Agent loop written by hand** (not the SDK's tool runner): tools are async and share the
 request's DB session, every step goes into a trace shown in the UI, and the number of rounds is
@@ -163,7 +170,7 @@ statistics call). Logs go to stderr, because stdout carries the protocol on stdi
 
 ## 7. Testing
 
-* 36 tests: chunking rules from real PDF quirks, RRF, evaluation metrics, schema and retrieval
+* 37 tests: chunking rules from real PDF quirks, RRF, evaluation metrics, schema and retrieval
   against real PostgreSQL + pgvector (separate test database, rolled back per test), health
   endpoints, and the agent loop with a **scripted fake Claude client** (no key, no cost):
   parallel tool results in one message, unknown tool → error result, step cap, refusal.
