@@ -21,6 +21,7 @@ dependencies = [
     "anthropic>=2.0",
     "truststore>=0.10",
     "python-multipart>=0.0.9",  # file uploads in FastAPI
+    "mcp>=2.3",  # Model Context Protocol server (v2 API: MCPServer)
 ]
 
 [project.optional-dependencies]

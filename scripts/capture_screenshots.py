@@ -58,9 +58,13 @@ class Page:
 
 
 async def capture(
-    ws_url: str, url: str, question: str | None, width: int, height: int
+    ws_url: str, url: str, question: str | None, width: int, height: int, inspection: int | None
 ) -> tuple[bytes, bytes | None]:
-    """Returns (viewport screenshot, full answer bubble screenshot or None)."""
+    """Returns (viewport screenshot, extra screenshot or None).
+
+    Extra: the full answer bubble when a question is asked, or the inspection viewer panel
+    when --inspection is given.
+    """
     async with websockets.connect(ws_url, max_size=50_000_000) as ws:
         page = Page(ws)
         await page.call(
@@ -73,6 +77,13 @@ async def capture(
         await page.call("Page.enable")
         await page.call("Page.navigate", url=url)
         await page.wait_for("document.querySelectorAll('.list-item').length > 0", 60)
+        if inspection is not None:
+            await page.js(f"show({int(inspection)})")
+            await page.wait_for(
+                "(() => { const i = document.querySelector('#viewer img');"
+                " return i && i.complete && i.naturalWidth > 0; })()",
+                60,
+            )
         if question:
             await page.js(f"ask({json.dumps(question)})")
             await page.wait_for(ANSWER_DONE, 300)
@@ -83,6 +94,13 @@ async def capture(
         await asyncio.sleep(2)
         shot = await page.call("Page.captureScreenshot", format="png")
         answer = None
+        if inspection is not None and not question:
+            box = await page.js(
+                "(() => { const r = document.querySelector('#viewer').getBoundingClientRect();"
+                " return {x: r.x, y: r.y, width: r.width, height: r.height}; })()"
+            )
+            clip = await page.call("Page.captureScreenshot", format="png", clip={**box, "scale": 1})
+            answer = base64.b64decode(clip["data"])
         if question:
             # The whole answer bubble (sources and trace included): let the layout grow to full
             # height so nothing is clipped by a scroll container, then measure and capture.
@@ -114,6 +132,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--width", type=int, default=1500)
     parser.add_argument("--height", type=int, default=1000)
+    parser.add_argument("--inspection", type=int, help="open this inspection (viewer screenshot)")
     args = parser.parse_args()
 
     browser = next(b for b in BROWSERS if Path(b).exists())
@@ -139,7 +158,7 @@ def main() -> None:
             targets = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json/list"))
             ws_url = next(t for t in targets if t["type"] == "page")["webSocketDebuggerUrl"]
             png, answer = asyncio.run(
-                capture(ws_url, args.url, args.question, args.width, args.height)
+                capture(ws_url, args.url, args.question, args.width, args.height, args.inspection)
             )
         finally:
             process.terminate()
@@ -148,7 +167,8 @@ def main() -> None:
     args.out.write_bytes(png)
     print(f"saved {args.out} ({len(png) // 1024} KB)")
     if answer:
-        answer_path = args.out.with_name(args.out.stem + "_answer.png")
+        suffix = "_answer.png" if args.question else "_viewer.png"
+        answer_path = args.out.with_name(args.out.stem + suffix)
         answer_path.write_bytes(answer)
         print(f"saved {answer_path} ({len(answer) // 1024} KB)")
 

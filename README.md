@@ -17,6 +17,15 @@ switching for real-time UAV insulator inspection (TU Chemnitz).
 and why), searched the manuals, cited the passages `[S1]`, `[S4]`, and shows its tool calls,
 tokens and cost (here 3 tool calls, 12.9k tokens, $0.069).*
 
+![Detection with vision review on an openly licensed photo](docs/images/detection_review.png)
+
+*Why the second opinion matters (real run on a CC BY 2.0 photo of a US 230 kV line,
+[source](demo/images/ATTRIBUTION.md)): the glass-disc detector, trained on other imagery, found
+four small low-confidence objects and missed the post insulators on the poles. The vision
+review judged three of the four not to be insulators (two clearly foliage, one undecidable;
+red) and flagged the remaining one for a human (amber). Domain shift is caught instead of
+being reported as findings.*
+
 ## What it does
 
 1. **Detect** insulators with YOLOv8. *Auto* mode runs the fast YOLOv8n first and switches to
@@ -27,6 +36,8 @@ tokens and cost (here 3 tool calls, 12.9k tokens, $0.069).*
 3. **Ask:** an agent with five tools (manual search, inspections, statistics, review) answers
    questions; numbers come from SQL, manual statements carry `[S#]` citations.
 4. **Report:** generates a Markdown inspection report with findings, actions and citations.
+5. **MCP server:** the same tools for any Model Context Protocol client (Claude Desktop,
+   Claude Code, IDE agents). Read-only by design: external agents can query, not spend.
 
 ## Architecture
 
@@ -90,7 +101,28 @@ CPU, measured on a fresh stack).
 The thesis YOLO weights are **not** in this repository (dataset licence and pending publication).
 Without them the manual search and the agent work, and image upload returns a clear 503
 message. With weights, place `*.pt` files in `models/` before building (names in
-[detection.py](src/inspection_copilot/detection.py)).
+[detection.py](src/inspection_copilot/detection.py)); the first start then also runs detection
+on the four openly licensed demo images in [demo/images](demo/images/ATTRIBUTION.md).
+
+### Use the tools from Claude Desktop (MCP)
+
+With the database running and the package installed, add this to Claude Desktop's
+`claude_desktop_config.json` (adjust the path):
+
+```json
+{
+  "mcpServers": {
+    "insulator-inspection": {
+      "command": "C:\\path\\to\\insulator-inspection-copilot\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "inspection_copilot.mcp_server"]
+    }
+  }
+}
+```
+
+Claude then sees `search_manuals`, `list_inspections`, `get_inspection` and
+`inspection_statistics`. Verified with the MCP SDK client over stdio: tool discovery, a manual
+search and the statistics call.
 
 ### Development
 
@@ -100,7 +132,7 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -e ".[ml,dev]"
 docker compose up -d db
 alembic upgrade head
-pytest                                        # 34 tests; DB tests use a separate test database
+pytest                                        # 36 tests; DB tests use a separate test database
 python -m inspection_copilot.ingest           # manuals into the dev database
 python -m inspection_copilot.eval_retrieval   # retrieval evaluation
 uvicorn inspection_copilot.main:app --reload
@@ -140,6 +172,9 @@ US ([data/sources.toml](data/sources.toml)). The PDFs are downloaded, not stored
 
 * The manuals are older US documents, not current European standards (DIN EN / IEC); the agent
   says so when it matters.
+* The thesis detectors were trained on one dataset. On other imagery they degrade (domain
+  shift): on the openly licensed demo photos they found 0, 1, 3 and 4 objects, missed post
+  insulators and produced low-confidence false positives that the vision review rejected.
 * The YOLO models localise insulators; they do not classify defects. Condition assessment comes
   from the vision LLM and is an AI second opinion that flags cases for a qualified person.
 * On small or blurry aerial crops the vision review often answers "unclear" by design.
@@ -152,7 +187,7 @@ US ([data/sources.toml](data/sources.toml)). The PDFs are downloaded, not stored
 ## Project layout
 
 ```
-src/inspection_copilot/   detection, vision review, retrieval, agent, API, UI (static/)
+src/inspection_copilot/   detection, vision review, retrieval, agent, API, MCP server, UI
 migrations/               Alembic schema migrations
 eval/                     question set and results
 infra/                    Bicep and deployment scripts

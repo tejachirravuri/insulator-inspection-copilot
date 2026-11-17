@@ -151,27 +151,40 @@ flowchart LR
 *Measured on the live app:* a manual-search question answered in 13 s end to end
 (2 tool calls, 8.2k tokens, $0.048).
 
-## 6. Testing
+## 6. MCP server
 
-* 30 tests: chunking rules from real PDF quirks, RRF, evaluation metrics, schema and retrieval
+`mcp_server.py` exposes four tools (manual search, list / get inspections, statistics) over the
+Model Context Protocol, so Claude Desktop, Claude Code or any MCP client can use them. They call
+the same service layer as the REST API and the built-in agent. **Read-only by design:** the
+paid vision review stays behind the REST API and its daily budget, so an external agent can
+query everything but cannot spend money. Verified end to end with the SDK client over stdio
+(tool discovery, a manual search returning FIST 3-18 p. 4 for "punctured insulator", and the
+statistics call). Logs go to stderr, because stdout carries the protocol on stdio.
+
+## 7. Testing
+
+* 36 tests: chunking rules from real PDF quirks, RRF, evaluation metrics, schema and retrieval
   against real PostgreSQL + pgvector (separate test database, rolled back per test), health
   endpoints, and the agent loop with a **scripted fake Claude client** (no key, no cost):
   parallel tool results in one message, unknown tool → error result, step cap, refusal.
 * CI (GitHub Actions) runs lint, migrations and tests against a pgvector service container and
   builds the Docker image.
 
-## 7. Limitations (honest list)
+## 8. Limitations (honest list)
 
 * The manuals are US documents from 1996-2005, not current European standards.
 * PDF extraction sometimes mixes two-column text, so a chunk's section label can be one
   paragraph off.
 * The retrieval questions were drafted with an AI assistant from the documents.
 * Vision reviews on small aerial crops are often "unclear"; the system flags rather than guesses.
+* Domain shift: on openly licensed demo photos (other countries, other insulator types) the
+  detectors found 0-4 objects, missed post insulators and produced false positives that the
+  vision review rejected as foliage.
 * YOLO weights and APOLI dataset images are not in the repository (licence / publication not
   yet cleared), so a public demo needs openly licensed images.
 * Latency numbers are single runs on one laptop CPU.
 
-## 8. Likely interview questions
+## 9. Likely interview questions
 
 * *Why not let the LLM look at the whole image?* Cost and accuracy: the detector narrows the
   image to the regions that matter; crops give the LLM more pixels per insulator.
