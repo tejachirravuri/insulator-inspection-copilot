@@ -8,6 +8,7 @@ fails fast instead of at the first request.
 
 from functools import lru_cache
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,6 +28,18 @@ class Settings(BaseSettings):
     chunk_overlap_words: int = 40
 
     log_level: str = "INFO"
+
+    # Claude API. SecretStr keeps the key out of logs, reprs and error messages.
+    # The key lives only in .env (git-ignored) or in the cloud's secret store.
+    anthropic_api_key: SecretStr | None = None
+    llm_model: str = "claude-opus-5-5"
+    agent_effort: str = "medium"  # low | medium | high: thinking depth and token spend
+    agent_max_steps: int = 8  # hard cap on tool-calling rounds per question
+
+    # YOLO weights (not in Git) and uploaded images.
+    preload_models: bool = True  # load the embedding model at server start
+    models_dir: str = "models"
+    uploads_dir: str = "data/uploads"
 
 
 @lru_cache

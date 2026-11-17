@@ -18,6 +18,9 @@ dependencies = [
     "alembic>=1.13",
     "pgvector>=0.3.2",
     "pydantic-settings>=2.4",
+    "anthropic>=2.0",
+    "truststore>=0.10",
+    "python-multipart>=0.0.9",  # file uploads in FastAPI
 ]
 
 [project.optional-dependencies]
@@ -26,6 +29,7 @@ dependencies = [
 ml = [
     "sentence-transformers>=3.0",
     "pypdf>=5.0",
+    "ultralytics>=8.3",
 ]
 dev = [
     "pytest>=8.2",

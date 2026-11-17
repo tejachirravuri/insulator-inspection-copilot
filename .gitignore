@@ -16,6 +16,7 @@ dist/
 *.onnx
 data/images/
 data/raw/
+data/uploads/
 
 # Editors / OS
 .vscode/

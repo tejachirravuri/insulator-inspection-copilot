@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insulator Inspection Copilot</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --panel-2: #1c2330; --line: #2a3340;
+    --text: #e6edf3; --muted: #8b98a8; --accent: #f2b33d; --accent-2: #3fb5ff;
+    --ok: #3fb950; --warn: #f2b33d; --bad: #f85149; --none: #8b98a8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+    border-bottom: 1px solid var(--line); background: var(--panel); }
+  header h1 { font-size: 16px; margin: 0; letter-spacing: .3px; }
+  header .tag { color: var(--muted); font-size: 12px; }
+  .logo { width: 26px; height: 26px; border-radius: 6px;
+    background: conic-gradient(from 200deg, var(--accent), var(--accent-2), var(--accent)); }
+  main { display: grid; grid-template-columns: 260px 1fr 420px; height: calc(100vh - 51px); }
+  section { overflow: auto; border-right: 1px solid var(--line); }
+  section:last-child { border-right: 0; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+    margin: 16px 16px 8px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    margin: 0 12px 12px; padding: 12px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 6px 0 2px; }
+  select, input[type=file], textarea { width: 100%; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px; font: inherit; }
+  button { background: var(--accent); color: #111; border: 0; border-radius: 6px; padding: 7px 12px;
+    font-weight: 600; cursor: pointer; font: inherit; font-weight: 600; }
+  button.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); }
+  button:disabled { opacity: .5; cursor: wait; }
+  .list-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; margin: 0 8px 4px;
+    border: 1px solid transparent; }
+  .list-item:hover { background: var(--panel); }
+  .list-item.active { background: var(--panel); border-color: var(--accent); }
+  .list-item small { color: var(--muted); display: block; }
+  .pill { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 99px;
+    border: 1px solid var(--line); color: var(--muted); margin-right: 4px; }
+  .pill.flag { color: var(--warn); border-color: var(--warn); }
+  .pill.bad { color: var(--bad); border-color: var(--bad); }
+  .pill.ok { color: var(--ok); border-color: var(--ok); }
+  #viewer { padding: 16px; }
+  .stage { position: relative; display: inline-block; max-width: 100%; }
+  .stage img { display: block; max-width: 100%; max-height: 58vh; border-radius: 8px; }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 6px 10px; }
+  .stat b { display: block; font-size: 16px; }
+  .stat span { color: var(--muted); font-size: 11px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+  .empty { color: var(--muted); padding: 40px; text-align: center; }
+  #chat { display: flex; flex-direction: column; }
+  #messages { flex: 1; overflow: auto; padding: 12px; }
+  .msg { margin-bottom: 14px; }
+  .msg.user .bubble { background: var(--panel-2); margin-left: 40px; }
+  .bubble { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .bubble p:first-child { margin-top: 0; } .bubble p:last-child { margin-bottom: 0; }
+  .bubble table { margin: 8px 0; }
+  .cite { color: var(--accent-2); font-weight: 600; cursor: help; }
+  details { margin-top: 6px; font-size: 12px; color: var(--muted); }
+  details summary { cursor: pointer; }
+  .trace-step { border-left: 2px solid var(--accent-2); padding: 2px 8px; margin: 4px 0; }
+  .trace-step.err { border-color: var(--bad); }
+  .source { background: var(--panel-2); border-radius: 6px; padding: 6px 8px; margin: 4px 0;
+    color: var(--text); max-height: 140px; overflow: auto; }
+  .composer { border-top: 1px solid var(--line); padding: 10px; display: flex; gap: 8px; }
+  .composer textarea { height: 56px; resize: none; }
+  .suggest { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 8px; }
+  .suggest button { font-size: 12px; padding: 4px 8px; }
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--muted);
+    border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;
+    vertical-align: -2px; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #report { margin-top: 12px; }
+  @media (max-width: 1100px) {
+    main { grid-template-columns: 1fr; height: auto; }
+    section { border-right: 0; border-bottom: 1px solid var(--line); }
+    #messages { max-height: 60vh; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"></div>
+  <h1>Insulator Inspection Copilot</h1>
+  <span class="tag">YOLOv8 detection · vision-LLM second opinion · RAG over maintenance manuals · tool-calling agent</span>
+</header>
+<main>
+  <section>
+    <h2>New inspection</h2>
+    <div class="card">
+      <form id="upload">
+        <label>Drone image (JPEG/PNG)</label>
+        <input type="file" name="file" accept="image/jpeg,image/png" required>
+        <label>Insulator type (selects the YOLO model)</label>
+        <select name="insulator_type">
+          <option value="glass">Glass</option>
+          <option value="porcelain">Porcelain</option>
+          <option value="composite">Composite</option>
+        </select>
+        <label>Detector mode</label>
+        <select name="mode">
+          <option value="auto">Auto: fast model, escalate if unsure</option>
+          <option value="fast">Fast (YOLOv8n)</option>
+          <option value="accurate">Accurate (YOLOv8s)</option>
+        </select>
+        <div style="margin-top:10px"><button type="submit">Detect insulators</button></div>
+      </form>
+    </div>
+    <h2>Inspections</h2>
+    <div id="list"></div>
+  </section>
+
+  <section id="viewer"><div class="empty">Select or upload an inspection.</div></section>
+
+  <section id="chat">
+    <h2>Ask the copilot</h2>
+    <div class="suggest" id="suggest"></div>
+    <div id="messages"></div>
+    <form class="composer" id="composer">
+      <textarea name="q" placeholder="e.g. Which inspections need a human review, and what do the manuals say about glaze burns?"></textarea>
+      <button type="submit">Ask</button>
+    </form>
+  </section>
+</main>
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const md = s => DOMPurify.sanitize(marked.parse(s || ""));
+let current = null, history = [];
+
+const COLORS = { good: "var(--ok)", flagged: "var(--warn)", high: "var(--bad)", none: "var(--accent-2)" };
+function verdict(d) {
+  const r = d.review;
+  if (!r) return { key: "none", label: "not reviewed" };
+  if (r.severity === "high" || !r.is_insulator) return { key: "high", label: r.is_insulator ? `${r.condition} (high)` : "not an insulator?" };
+  if (r.needs_human_review) return { key: "flagged", label: `${r.condition} · ${r.severity}` };
+  return { key: "good", label: `${r.condition} · ${r.severity}` };
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, opts);
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || res.statusText);
+  return res.json();
+}
+
+async function loadList() {
+  const rows = await api("/api/inspections");
+  $("#list").innerHTML = rows.length ? rows.map(r => `
+    <div class="list-item ${current === r.id ? "active" : ""}" data-id="${r.id}">
+      #${r.id} ${esc(r.filename)}
+      <small>${esc(r.insulator_type)} · ${r.detections} insulators · ${r.mode}${r.escalated ? " (escalated)" : ""}</small>
+      ${r.flagged_for_human_review ? `<span class="pill flag">${r.flagged_for_human_review} need human review</span>` : ""}
+    </div>`).join("") : `<div class="empty">No inspections yet.</div>`;
+  document.querySelectorAll(".list-item").forEach(el => el.onclick = () => show(+el.dataset.id));
+}
+
+async function show(id) {
+  current = id;
+  loadList();
+  const d = await api(`/api/inspections/${id}`);
+  const run = d.run || {};
+  const boxes = d.detections.map((det, i) => {
+    const v = verdict(det), [x1, y1, x2, y2] = det.box;
+    return `<g><rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" fill="none"
+      stroke="${COLORS[v.key]}" stroke-width="${Math.max(2, d.width / 300)}"/>
+      <text x="${x1 + 4}" y="${Math.max(14, y1 - 4)}" fill="${COLORS[v.key]}"
+      font-size="${Math.max(12, d.width / 45)}" font-weight="700">${i + 1} · ${det.confidence.toFixed(2)}</text></g>`;
+  }).join("");
+  const reviewed = d.detections.some(x => x.review);
+  $("#viewer").innerHTML = `
+    <div class="stage">
+      <img src="/api/inspections/${id}/image" alt="inspection ${id}">
+      <svg viewBox="0 0 ${d.width} ${d.height}" preserveAspectRatio="none">${boxes}</svg>
+    </div>
+    <div class="meta">
+      <div class="stat"><b>${d.detections.length}</b><span>insulators found</span></div>
+      <div class="stat"><b>${esc(run.model || "-")}</b><span>model used (${esc(run.requested_mode || "")} mode)</span></div>
+      <div class="stat"><b>${run.inference_ms ? Math.round(run.inference_ms) + " ms" : "-"}</b><span>${run.escalated ? `fast pass ${Math.round(run.fast_ms)} ms → escalated` : "CPU inference"}</span></div>
+      <div class="stat"><b>${d.detections.filter(x => x.review?.needs_human_review).length}</b><span>flagged for human review</span></div>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:12px">
+      <button id="btn-review" ${reviewed ? "class='secondary'" : ""}>${reviewed ? "Re-run AI second opinion" : "AI second opinion (vision LLM)"}</button>
+      <button id="btn-report" class="secondary">Generate inspection report</button>
+    </div>
+    <table>
+      <tr><th>#</th><th>YOLO conf.</th><th>AI verdict</th><th>Rationale</th></tr>
+      ${d.detections.map((det, i) => { const v = verdict(det); return `<tr>
+        <td><span class="swatch" style="background:${COLORS[v.key]}"></span>${i + 1}</td>
+        <td>${det.confidence.toFixed(2)}</td><td>${esc(v.label)}</td>
+        <td style="color:var(--muted)">${esc(det.review?.rationale || "")}</td></tr>`; }).join("")}
+    </table>
+    <div id="report"></div>`;
+  $("#btn-review").onclick = async e => {
+    e.target.disabled = true; e.target.innerHTML = `<span class="spinner"></span>Claude is looking at the crops…`;
+    try { const r = await api(`/api/inspections/${id}/review`, { method: "POST" });
+      await show(id); toast(`Reviewed ${r.review.reviewed} crops for $${r.review.cost_usd}`); }
+    catch (err) { toast(err.message); e.target.disabled = false; }
+  };
+  $("#btn-report").onclick = async e => {
+    e.target.disabled = true; e.target.innerHTML = `<span class="spinner"></span>Agent is writing the report…`;
+    try { const r = await api(`/api/inspections/${id}/report`, { method: "POST" });
+      await show(id); $("#report").innerHTML = `<div class="bubble">${renderAnswer(r)}</div>
+        <div style="margin-top:8px"><button class="secondary" id="dl">Download Markdown</button></div>`;
+      $("#dl").onclick = () => download(`inspection-${id}.md`, r.answer + "\n\n## Sources\n" +
+        r.sources.map(s => `- [${s.id}] ${s.document}, ${s.section || ""}, p. ${s.pages}`).join("\n"));
+    } catch (err) { toast(err.message); e.target.disabled = false; }
+  };
+}
+
+function renderAnswer(r) {
+  const used = new Set((r.answer.match(/\[S\d+\]/g) || []).map(s => s.slice(1, -1)));
+  const html = md(r.answer).replace(/\[(S\d+)\]/g, (m, id) => {
+    const s = r.sources.find(x => x.id === id);
+    return `<span class="cite" title="${esc(s ? `${s.document} — ${s.section || ""} — p. ${s.pages}` : "")}">[${id}]</span>`;
+  });
+  const sources = r.sources.filter(s => used.has(s.id));
+  return `${html}
+    ${sources.length ? `<details open><summary>Sources (${sources.length})</summary>${sources.map(s =>
+      `<div class="source"><b class="cite">[${s.id}]</b> ${esc(s.document)} · ${esc(s.section || "")} · p. ${esc(s.pages)}<br>${esc(s.text)}</div>`).join("")}</details>` : ""}
+    <details><summary>Agent trace: ${r.trace.length} tool call(s) · ${r.input_tokens + r.output_tokens} tokens · $${r.cost_usd}</summary>
+      ${r.trace.map(t => `<div class="trace-step ${t.is_error ? "err" : ""}"><b>${esc(t.tool)}</b>(${esc(JSON.stringify(t.input))}) → ${esc(t.summary)} <span>(${Math.round(t.ms)} ms)</span></div>`).join("") || "no tools used"}
+    </details>`;
+}
+
+function addMsg(role, html) {
+  const el = document.createElement("div");
+  el.className = `msg ${role}`; el.innerHTML = `<div class="bubble">${html}</div>`;
+  $("#messages").appendChild(el); el.scrollIntoView({ behavior: "smooth" });
+  return el;
+}
+
+async function ask(q) {
+  addMsg("user", esc(q));
+  const pending = addMsg("assistant", `<span class="spinner"></span>Thinking and calling tools…`);
+  try {
+    const r = await api("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q, history }) });
+    pending.querySelector(".bubble").innerHTML = renderAnswer(r);
+    history.push({ role: "user", content: q }, { role: "assistant", content: r.answer });
+    history = history.slice(-10);
+    if (current) show(current); else loadList();
+  } catch (err) { pending.querySelector(".bubble").textContent = "Error: " + err.message; }
+}
+
+function download(name, text) {
+  const a = Object.assign(document.createElement("a"), {
+    href: URL.createObjectURL(new Blob([text], { type: "text/markdown" })), download: name });
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function toast(msg) {
+  const el = Object.assign(document.createElement("div"), { textContent: msg });
+  Object.assign(el.style, { position: "fixed", bottom: "16px", left: "50%", transform: "translateX(-50%)",
+    background: "var(--panel-2)", border: "1px solid var(--line)", padding: "8px 14px", borderRadius: "8px" });
+  document.body.appendChild(el); setTimeout(() => el.remove(), 4000);
+}
+
+$("#upload").onsubmit = async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector("button");
+  btn.disabled = true; btn.innerHTML = `<span class="spinner"></span>Running YOLO…`;
+  try { const d = await api("/api/inspections", { method: "POST", body: new FormData(e.target) });
+    await show(d.id); }
+  catch (err) { toast(err.message); }
+  finally { btn.disabled = false; btn.textContent = "Detect insulators"; }
+};
+$("#composer").onsubmit = e => {
+  e.preventDefault(); const q = e.target.q.value.trim(); if (!q) return;
+  e.target.q.value = ""; ask(q);
+};
+$("#composer textarea").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#composer").requestSubmit(); }
+});
+["Which inspections need a human review?", "How should glass insulators with glaze burns be handled?",
+ "How often does auto mode escalate to the accurate model, and what does it cost in latency?",
+ "How do I check porcelain insulators for cracks?"].forEach(q => {
+  const b = Object.assign(document.createElement("button"), { className: "secondary", textContent: q });
+  b.onclick = () => ask(q); $("#suggest").appendChild(b);
+});
+loadList();
+</script>
+</body>
+</html>

@@ -11,7 +11,19 @@ Two halves:
 from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Computed, DateTime, Float, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import (
+    Boolean,
+    Computed,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    false,
+    func,
+)
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -88,6 +100,7 @@ class Image(Base):
     insulator_type: Mapped[str] = mapped_column(String(50))  # glass | porcelain | composite
     width: Mapped[int] = mapped_column(Integer)
     height: Mapped[int] = mapped_column(Integer)
+    storage_path: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     runs: Mapped[list["DetectionRun"]] = relationship(
@@ -101,7 +114,10 @@ class DetectionRun(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     image_id: Mapped[int] = mapped_column(ForeignKey("images.id", ondelete="CASCADE"), index=True)
     model_name: Mapped[str] = mapped_column(String(200))  # e.g. glass_y8n_fast
-    mode: Mapped[str] = mapped_column(String(20))  # fast | accurate
+    mode: Mapped[str] = mapped_column(String(20))  # model that produced the boxes: fast | accurate
+    requested_mode: Mapped[str] = mapped_column(String(20), server_default="fast")  # or auto
+    escalated: Mapped[bool] = mapped_column(Boolean, server_default=false())  # auto: fast->accurate
+    fast_ms: Mapped[float | None] = mapped_column(Float)  # auto: latency of the fast pass
     inference_ms: Mapped[float] = mapped_column(Float)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
@@ -127,3 +143,28 @@ class Detection(Base):
     y2: Mapped[float] = mapped_column(Float)
 
     run: Mapped[DetectionRun] = relationship(back_populates="detections")
+    reviews: Mapped[list["DetectionReview"]] = relationship(
+        back_populates="detection", cascade="all, delete-orphan"
+    )
+
+
+class DetectionReview(Base):
+    """Second opinion on one detection from a vision LLM (human-in-the-loop flagging)."""
+
+    __tablename__ = "detection_reviews"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    detection_id: Mapped[int] = mapped_column(
+        ForeignKey("detections.id", ondelete="CASCADE"), index=True
+    )
+    model: Mapped[str] = mapped_column(String(100))
+    agrees_with_detector: Mapped[bool] = mapped_column(Boolean)
+    condition: Mapped[str] = mapped_column(String(50))
+    severity: Mapped[str] = mapped_column(String(20))
+    needs_human_review: Mapped[bool] = mapped_column(Boolean)
+    rationale: Mapped[str] = mapped_column(Text)
+    input_tokens: Mapped[int] = mapped_column(Integer)
+    output_tokens: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    detection: Mapped[Detection] = relationship(back_populates="reviews")
