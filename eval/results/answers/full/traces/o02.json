@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What tightening torque should be used for the end fittings of a composite long-rod insulator from a specific manufacturer such as Lapp?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"tightening torque end fittings composite insulator\"\n}",
+    "result_summary": "5 passages: S1 p.22-23, S2 p.73, S3 p.74, S4 p.79-80, S5 p.26",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"bolt torque values insulator hardware connections\"\n}",
+    "result_summary": "5 passages: S6 p.79-80, S7 p.151, S8 p.73, S9 p.111-112, S10 p.178",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "I can't give you a torque value. None of the manuals in the knowledge base lists one for composite long-rod insulator end fittings, from Lapp or any other manufacturer, and I won't guess a number.\n\n**What the manuals do cover:**\n- TM 5-684 describes composite insulators only in general terms: a resin and glass-fibre core, polymer weathersheds and metal end fittings. It gives no installation or torque data [S1].\n- Wherever torque comes up, the manuals send you to the manufacturer. Examples are \"check bolts for manufacturer's recommended torque\" for disconnect switch hardware [S4], and \"refer to manufacturer recommendations for proper torque values\" for bolted bus joints [S9].\n\n**Where to find the value:**\n- **Lapp Insulators' installation instructions or datasheet** for your exact catalogue number. Torque depends on the fitting type (clevis, tongue, ball/socket, Y-clevis), the bolt size and the material.\n- **The hardware supplier's data** for the bolts and connecting fittings, if they don't come from Lapp.\n- **Your utility's construction standards or work instructions.**\n\nThese are older US documents (1996–2005), not current European standards. If you work in Germany or the EU, the relevant references are product standards such as IEC 61109 / DIN EN 61109 for composite insulators and DIN EN 50341 for overhead lines. I don't have those in the knowledge base, so I can't quote them."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22-23",
+        "text": "To avoid damaging good insulators, tap them; do not hit them hard. (3) Repair. (a) If the main body of a pin type or post insulator is cracked, replace it immediately. (b) Hone small chips from shells or skirts, and paint with an insulating paint or varnish to provide a glossy finish and to lessen dirt accumulation. (c) Since the loss of a skirt on a pin-type insulator reduces the insulation value of the insulator by 30 percent or more, replace such broken units. b. Nonceramic insulators. Nonceramic or composite insulators include core, weathersheds, and metal-end fittings. A weathershed is the external part of the insulator that protects the core or mechanical load-bearing component and provides the wet electrical strength and leakage distance. The core consists of resin and glass fibers. The weathersheds are of polymeric materials such as epoxy resins or elastomers and normally contain inorganic fillers. Since the insulating qualities of insulators, and their ability to prevent flashovers, depend on preventing contamination buildup, cleaning frequencies will depend on the location."
+      },
+      {
+        "id": "S2",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix B GENERATOR AND LARGE MOTOR PREVENTIVE MAINTENANCE",
+        "pages": "73",
+        "text": "Foundation, Base, or Support • Check concrete foundation for cracks. Check base or support for broken, loose, or weakened parts. Check and tighten anchor bolts. Check soundabsorbing base for adequacy. Frame • Check for cracks and loose or broken parts. Clean and repaint as necessary. Check frame ground connection. Laminations and Pole Pieces • Check for loose laminations and tighten clamping bolts. If laminations vibrate and cannot be stopped by tightening clamping bolts, force some quick-drying varnish or shellac between the loose laminations while the machine is out of service. Check for damaged laminations at airgap due to rubbing or objects caught in airgap. Check and tighten field pole piece clamping bolts. (Refer to manufacturer’s instructions or contact the Hydroelectric Research and Technical Services Group at 303-445-2300 for proper torque values.) Armature or Rotor • Check squirrel-cage rotor bars or amortisseur windings for loose or broken bars or end connections. Check field circuit connections and tighten if necessary. Check voltage drop across each pole by applying alternating current at the collector rings."
+      },
+      {
+        "id": "S3",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix B GENERATOR AND LARGE MOTOR PREVENTIVE MAINTENANCE",
+        "pages": "74",
+        "text": "Clean exposed parts of windings thoroughly with a nonflammable solvent using suitable brushes for hard-to-reach places. The use of carbon tetrachloride is not recommended because of the toxic hazard. Revarnish windings if insulation is becoming hard, brittle, or dull. Check for insulation deterioration such as tape separation, cracking, brittleness, or evidence of corona. Check insulation with high voltage direct current method. (See FIST Volume 3-1, Testing Solid Insulation of Electrical Equipment.) Banding and Lashing • Check wire and string banding on direct current armature windings. Check end-turn lashing of alternating current stator coils. Apply lashing if end turns vibrate excessively. Slot Wedges • Check slot wedges and replace loose ones. Tighten coils in slots by rewedging, if necessary. Commutator or Collector Rings • Daily – Check commutator or collection rings and brush operation. Wipe commutator or rings if needed. Have brushes replaced if worn too short. Brushes and Brush Rigging • Turn down, stone, or polish commutator or collector rings if grooved, rough, or eccentric. Undercut mica if high."
+      },
+      {
+        "id": "S4",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix C DISCONNECT SWITCH PREVENTIVE MAINTENANCE",
+        "pages": "79-80",
+        "text": "Base and mounting Check for loose bolts and insecure or inadequate supporting structure. Ventilating louvers and air filters Clean and replace as needed. Buses, splices, and bolts Check bolts for manufacturer’s recommended torque. Insulators Check for chipped or broken porcelain, excessive dirt film, and tracking; clean as necessary; replace broken insulators; tighten base and cap bolts. Space heaters Verify operation or operate continuously to overcome thermostat malfunction. Main switch blades and contacts See that blades are properly seated in the contacts; operate the switch several times and see that blades are properly aligned to engage contacts; clean contact surfaces if corroded; lubricate; tighten bolts and screws. Continued Contact and hinge spring and shunts Check pressure springs in contact and hinge and replace, if not adequate; replace flexible shunts, if frayed. Blade latches and stops See that blade latches, where provided, are engaged; check latches for proper engaging and holding blade against opening force. See that stops are in place and tight. Arcing switch blades and contacts Do not lubricate."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-29. Maintenance of instrument transformers.",
+        "pages": "26",
+        "text": "Tighten all loose joints in conduit around fittings, terminal boxes and supporting clamps. Clean and paint corroded areas. Verify tightness of all bolted connections. Verify that wiring, grounding, and shorting connections provide good contact. (3) Drawout mechanisms. Test the proper operation of the voltage transformer withdrawal mechanisms (tip out) and grounding operation. Instrument transformers rated above 15 kilovolts should receive power factor tests during the scheduled maintenance period for transformers given in table 7-l. Procedure for making these tests is described in section VII. Other tests, which may be made during or after shop repairs, include: a. Oil analysis. b. Ratio. c. Polarity. d. Resistance. e. Exciting current. f. Overvoltage. A bushing is an insulating structure which provides a through conductor or a passageway for such a conductor. A bushing has a provision for mounting on a barrier (conducting or otherwise). The bushing insulates the conductor from the barrier and conducts current from one side of the barrier to the other side."
+      },
+      {
+        "id": "S6",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix C DISCONNECT SWITCH PREVENTIVE MAINTENANCE",
+        "pages": "79-80",
+        "text": "Base and mounting Check for loose bolts and insecure or inadequate supporting structure. Ventilating louvers and air filters Clean and replace as needed. Buses, splices, and bolts Check bolts for manufacturer’s recommended torque. Insulators Check for chipped or broken porcelain, excessive dirt film, and tracking; clean as necessary; replace broken insulators; tighten base and cap bolts. Space heaters Verify operation or operate continuously to overcome thermostat malfunction. Main switch blades and contacts See that blades are properly seated in the contacts; operate the switch several times and see that blades are properly aligned to engage contacts; clean contact surfaces if corroded; lubricate; tighten bolts and screws. Continued Contact and hinge spring and shunts Check pressure springs in contact and hinge and replace, if not adequate; replace flexible shunts, if frayed. Blade latches and stops See that blade latches, where provided, are engaged; check latches for proper engaging and holding blade against opening force. See that stops are in place and tight. Arcing switch blades and contacts Do not lubricate."
+      },
+      {
+        "id": "S7",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II-FLOODED LEAD-ACID BATTERY MAINTENANCE 14-5. Visual inspections of batteries.",
+        "pages": "151",
+        "text": "In areas of high seismic activity, connections sometimes fail if seismic acceptance testing was not properly performed. (3) Battery terminals . Battery terminals may be inspected using a current/resistance (IR) probe. A connection carrying current with resistance will heat up. Retorquing cell connections without justification will lead to failure. If connection is loose or has high resistance (heating) it must be disassembled, cleaned and reassembled, includin g torquing. If the nut does not turn on the bolt freely, the bolt and nut must be replaced. A connection carrying current without heating does not need to be retorqued. A connection which is heating needs to be cleaned. - (4) Other checks. Check for electrolyte spillage, evidence of corrosion, and vent cap damage, and correct any problems .Examine cables connecting the battery to the battery charger and those cables used as intercell or intertier connectors, to ensure there is no strain on the cell posts, and to check that terminal posts and connections are clean. b. Excessive gassing."
+      },
+      {
+        "id": "S8",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix B GENERATOR AND LARGE MOTOR PREVENTIVE MAINTENANCE",
+        "pages": "73",
+        "text": "Foundation, Base, or Support • Check concrete foundation for cracks. Check base or support for broken, loose, or weakened parts. Check and tighten anchor bolts. Check soundabsorbing base for adequacy. Frame • Check for cracks and loose or broken parts. Clean and repaint as necessary. Check frame ground connection. Laminations and Pole Pieces • Check for loose laminations and tighten clamping bolts. If laminations vibrate and cannot be stopped by tightening clamping bolts, force some quick-drying varnish or shellac between the loose laminations while the machine is out of service. Check for damaged laminations at airgap due to rubbing or objects caught in airgap. Check and tighten field pole piece clamping bolts. (Refer to manufacturer’s instructions or contact the Hydroelectric Research and Technical Services Group at 303-445-2300 for proper torque values.) Armature or Rotor • Check squirrel-cage rotor bars or amortisseur windings for loose or broken bars or end connections. Check field circuit connections and tighten if necessary. Check voltage drop across each pole by applying alternating current at the collector rings."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-15. Maintenance of metalclad circuit breakers.",
+        "pages": "111-112",
+        "text": "Checking for contact erosion and vacuum ground buses by wiping with a dry, clean cloth or by condition is made with the circuit breaker removed vacuuming. ‘- from its switchgear cubicle. (a) Close the circuit breaker and measure the spring plate overtravel. Consult the manufac- (d) Check tightness of accessible bolted bus joints by the calibrated wrench method. Refer to manufacturer recommendations for proper torque values. Also check alignment and contacts of primary disconnecting devices for abnormal wear or damage. Check for sulfide deposits and use a solvent, such as alcohol, for removal of these deposits. (e) After cleaning and adjusting, run insulation resistance tests to measure resistance to ground and compare with previous readings for any sign of weakening of the insulation system. Comparisons should be made using a common temperature and humidity base. (3) Miscellaneous checks. Check supporting devices such as protective relays and controls as covered in chapter 11 and as follows:"
+      },
+      {
+        "id": "S10",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "16-5. Electrical noise origin.",
+        "pages": "178",
+        "text": "(1) To locate noise from the first two causes, items of line equipment should be examined for the following defects: (a) Loose hot-line clamps. (b) Corroded fuse ferrules in cutout boxes. (c) Defective surge arresters (particularly the gapped valve type). (d) Defective insulators and transformer bushings. (e) Defects in the internal insulation of a transformer. (f) Loose connections in a neutral circuit. (g) Loose ties on insulators and neutral brackets. (h) Covered tie wire used on a bare conductor. (i) Loose pole-line hardware. (j) Insufficient spacing between grounded and ungrounded parts of pole assembly. Spacing should be 2 inches (51 millimeters) minimum for 7.2 kilovolts and 8 inches (204 millimeters) minimum for 14.4 kilovolts. (2) Noise from electrostatic leakage is most commonly found on a multigrounded neutral type of circuit and is the most difficult to trace. Noise which originates on the primary, due to leaky insulators and the like, generally dies out within a few spans and is easily found."
+      }
+    ]
+  }
+]

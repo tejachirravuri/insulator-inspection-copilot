@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "At what hydrogen concentration can battery gas explode?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"battery hydrogen gas explosive concentration percent\"\n}",
+    "result_summary": "5 passages: S1 p.149, S2 p.149, S3 p.149, S4 p.159, S5 p.152",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "According to TM 5-684, **hydrogen from battery charging can explode once the mixture is above 8 percent hydrogen**. It can already catch fire above **4 percent** [S1].\n\nRelated points from the same manual:\n- **Limit:** gas buildup in the battery room or enclosure should stay below **2 percent** of its total volume [S3].\n- **How fast hydrogen builds up:** a flooded lead-acid battery gives off at most 0.000269 ft³ (7618 mm³) of hydrogen per minute per charging ampere per cell, at 77 °F (25 °C) and one atmosphere. This peak happens when a fully charged battery is forced to take maximum current [S3].\n- **Ignition sources:** keep sparks and flames away from batteries [S2]. Vented nickel-cadmium cells can also give off an explosive hydrogen/oxygen mix that must be vented away [S4].\n\nThis comes from a 1996 US Army manual. In Germany or the EU, size battery room ventilation using current standards, such as DIN EN IEC 62485. The manuals I can search don't cover those standards."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "14-3. Battery safety.",
+        "pages": "149",
+        "text": "The hydrogen gas produced by charging batteries is flammable in an atmosphere where the gas content exceeds 4 percent hydrogen gas. If the mixture contains more than 8 percent hydrogen, it can explode. b. Electrolyte hazard. Battery rooms are required by OSHA to provide emergency-use quick-drenching facilities for the eyes and body within 25 feet of the work area. Permanent emergency eyewash and showers are recommended. Portable emergency eyewash and showers must be brought into the maintenance area if permanent facilities are not provided. Squeeze bottles can substitute for eyewash fountains, and canisters that resemble fire extinguishers can be fitted to provide an eyewash or a quick drench. Periodic inspection and maintenance of these devices are mandatory. Be sure to change the water as recommended to eliminate possible bacteria. Squeeze bottles are date coded and should be replaced before the expiration date. Exercise canister units periodically to prevent clogging of the head. Ensure that a good flow of water is available when it’s really needed. c. Explosive gas hazard."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "14-3. Battery safety.",
+        "pages": "149",
+        "text": "This solution is beneficial in neutralizing either alkaline or acid electrolyte. Extreme care must be taken in the use of hydrometers or syringes to avoid accidentally squirting electrolyte at or on anyone. (1) Warning notice . It is recommended that a warning notice be posed near the battery installation as shown in table 14-1. Use the first parenthesis as applicable to the electrolyte type. Fill in the fault current amperes. (2) Warning sign .It is recommended that a warning sign be posted in advance of the installed table 14-1 warning notice. Figure 14-1 is a warning sign used by a manufacturer who provides small sealed, low-gassing type batteries. Note that this warning sign indicates DANGER even for what is represented as a small sealed-battery system. Particular attention must be given to the prevention of sparks or flames near batteries. The hydrogen gas produced by charging batteries is flammable in an atmosphere where the gas content exceeds 4 percent hydrogen gas. If the mixture contains more than 8 percent hydrogen, it can explode. b. Electrolyte hazard."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "14-3. Battery safety.",
+        "pages": "149",
+        "text": "Squeeze bottles are date coded and should be replaced before the expiration date. Exercise canister units periodically to prevent clogging of the head. Ensure that a good flow of water is available when it’s really needed. c. Explosive gas hazard. The NEC requires removal of possible explosive gas buildup, since all battery types can outgas. Check that gas accumulation is limited to less than 2 percent of the total volume of the battery room or enclosure. For flooded lead-acid batteries, the maximum hydrogen evolution rate is 0.000269 cubic feet (7618 cubic millimeters) per minute per charging ampere per cell at 77 degrees F (25 degree s C), one atmosphere. The maximum rate occurs when a fully charged battery has maximum current forced into it. d. Electrical hazard. Most batteries are operated ungrounded, so touching a live part will not result in a shock. The real hazard exists when an accidental ground is already present and a person touches a live part. In this case, the person completes the circuit to ground and current will flow through the person."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "14-15. Temperature compensation for valveregulated cells.",
+        "pages": "159",
+        "text": "Consult manufacturers’ catalogs fo r spe- particularly when the battery has a low internal cific values for their cells. Ripple content of the resistance. The nickel-cadmium technology results in more expensive batteries but these batteries are resistant to mechanical and electrical abuse; will operate well over a wide temperature range; and can tolerate frequent shallow or deep discharging. a. Construction. Nickel-cadmium (NiCad) batteries may be flooded cell type; valve-regulated cell type, or sealed cells. (1) Flooded cells. These units utilize plates made of nickel-oxide for the positive electrode and cadmium for the negative electrode. The electrolyte is an alkaline solution of potassium hydroxide which does not take part in the cell reaction. Accordingly, its specific gravity does not change during charge or discharge, and the electrolyte retains its ability to transfer ions irrespective of the charge level. The majority of cells used in station battery applications are of the vented type. During discharge, vented-type cells can produce hydrogen gas and oxygen gas in a potentially explosive mixture which must be adequately exhausted."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II-FLOODED LEAD-ACID BATTERY MAINTENANCE 14-5. Visual inspections of batteries.",
+        "pages": "152",
+        "text": "A record of the amount of water added to each cell should be kept and checked with the battery manufacturer’s normal cell water consumption requirement. Lead-antimony batteries normally experience an increase in water consumption with age. Water consumption in excess of the manufacturer’s requirement is an indication of overcharging. A cell that has been recently moved or transported should not have water added until it has been placed back on charge for the period of time recommended by the manufacturer. If the plates were exposed while moving cells, consult the manufacturer for recommended action. Vibration during movement will tend to free hydrogen bubbles attached to the plates. The loss of these bubbles will cause a decrease in th e electrolye level. Once the cell is installed, the bubbles will reappear, and the electrolyte level will increase. Never add acid (or alkali) to a cell, nor any additive which claims to rejuvenate cells. (1) Vibration. Check the surface of the electrolyte for indication of any battery vibration."
+      }
+    ]
+  }
+]

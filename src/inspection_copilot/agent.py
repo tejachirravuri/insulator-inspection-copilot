@@ -145,8 +145,9 @@ class AgentAnswer:
 class _Toolbox:
     """Executes tool calls for one question; collects the cited sources."""
 
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession, allow_review: bool = True) -> None:
         self.session = session
+        self.allow_review = allow_review
         self.sources: list[Source] = []
 
     async def search_manuals(self, query: str) -> tuple[str, str]:
@@ -194,6 +195,9 @@ class _Toolbox:
         return json.dumps(stats), f"{stats['images']} images, {stats['detections']} detections"
 
     async def run(self, name: str, tool_input: dict) -> tuple[str, str, bool]:
+        if name == "review_inspection" and not self.allow_review:
+            # Evaluation runs must not write reviews or spend money on vision calls.
+            return "review_inspection is disabled in this context", "review disabled", True
         method = getattr(self, name, None)
         if name not in {t["name"] for t in TOOLS} or method is None:
             return f"Unknown tool {name}", "unknown tool", True
@@ -208,12 +212,15 @@ class _Toolbox:
 
 
 async def ask(
-    session: AsyncSession, question: str, history: list[dict] | None = None
+    session: AsyncSession,
+    question: str,
+    history: list[dict] | None = None,
+    allow_review: bool = True,
 ) -> AgentAnswer:
     """Answer one question. `history`: earlier [{"role", "content": str}] turns (text only)."""
     settings = get_settings()
     client = get_async_client()
-    toolbox = _Toolbox(session)
+    toolbox = _Toolbox(session, allow_review=allow_review)
     messages: list[dict] = [*(history or []), {"role": "user", "content": question}]
     answer = AgentAnswer(answer="", model=settings.llm_model)
 

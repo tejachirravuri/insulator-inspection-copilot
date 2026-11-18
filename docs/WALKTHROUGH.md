@@ -90,6 +90,15 @@ hybrid 0.51 / 0.57 -> hybrid with BM25 0.62 / 0.61. The rule was met, so hybrid 
 default for the agent and the MCP server. Cost: median 180 ms per BM25 search versus 30 ms,
 because corpus statistics are computed per query (materialized views would fix this at scale).
 
+**Answer-quality evaluation** (36 cases through the real agent, judge Claude Sonnet 5.5, a
+different model from the app): manual questions 24/24 correct and 24/24 cite the right passage,
+but only 6/24 fully faithful (1.75 unsupported claims per answer); data questions 8/8 against
+live SQL; out-of-scope 4/4 declined. Correctness saturates, faithfulness discriminates. The
+unsupported claims are model general knowledge plus caveats the system prompt itself requests
+(DIN EN / IEC), a prompt conflict the eval surfaced. Judge sanity-checked with oracle, empty,
+"I don't know" and wrong-question answers; blind human review of 10 cases prepared. Cost $1.49
+(pilot estimate $1.48), median 9.4 s per question.
+
 **Agent loop written by hand** (not the SDK's tool runner): tools are async and share the
 request's DB session, every step goes into a trace shown in the UI, and the number of rounds is
 capped (`AGENT_MAX_STEPS`) so cost per question is bounded. Tool results of one turn are returned
@@ -170,7 +179,7 @@ statistics call). Logs go to stderr, because stdout carries the protocol on stdi
 
 ## 7. Testing
 
-* 37 tests: chunking rules from real PDF quirks, RRF, evaluation metrics, schema and retrieval
+* 41 tests: chunking rules from real PDF quirks, RRF, evaluation metrics, schema and retrieval
   against real PostgreSQL + pgvector (separate test database, rolled back per test), health
   endpoints, and the agent loop with a **scripted fake Claude client** (no key, no cost):
   parallel tool results in one message, unknown tool → error result, step cap, refusal.
@@ -187,7 +196,7 @@ statistics call). Logs go to stderr, because stdout carries the protocol on stdi
 * Domain shift: on openly licensed demo photos (other countries, other insulator types) the
   detectors found 0-4 objects, missed post insulators and produced false positives that the
   vision review rejected as foliage.
-* YOLO weights and APOLI dataset images are not in the repository (licence / publication not
+* YOLO weights and the thesis dataset images are not in the repository (licence / publication not
   yet cleared), so a public demo needs openly licensed images.
 * Latency numbers are single runs on one laptop CPU.
 

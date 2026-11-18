@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Which ANSI guide covers grounding of instrument transformer secondary circuits?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"ANSI guide grounding instrument transformer secondary circuits\"\n}",
+    "result_summary": "5 passages: S1 p.18, S2 p.18, S3 p.16-18, S4 p.18-20, S5 p.25-26",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "It's **ANSI C57.13.3, \"Guide for the Grounding of Instrument Transformer Secondary Circuits and Cases.\"** Reclamation's FIST Volume 3-22 cites it [S3].\n\nThe FIST article takes these main requirements from it:\n- **Ground at only one point.** Each instrument transformer secondary circuit should connect to the station ground at a single point, however many secondary windings are on the circuit [S2], [S3].\n  - With more than one ground, fault current through the ground mat can push current through relay, instrument and meter coils. That can make readings inaccurate, cause relays to operate wrongly, and overheat the neutral conductor [S2].\n  - A single ground point also makes it easier to remove the ground temporarily for insulation and accidental-ground tests [S2].\n- **Put the ground at the control board or first point of application, not at the transformer.** Instrument transformers handle voltage rise better than control board parts. This also keeps voltages low for sensitive solid-state devices and protects staff where they're most likely to be exposed, at the control board [S1].\n- Some circuits may need to be grounded somewhere else for the equipment to work correctly. Other circuits that don't follow these rules should be changed to comply when feasible [S4].\n\nThis reference comes from a Reclamation bulletin dated 6/91, reprinted in 2000. The guide has been revised since then, so check the current edition. If you work in the EU or Germany, also check the applicable IEC/DIN EN standards. The manuals don't cover either of these."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "1. The instrument transformer secondary circuit",
+        "pages": "18",
+        "text": "2. The point of grounding in the instrument transformer secondary circuit should be at the control board or the first point of application. Grounding at the point of application, rather than at the trans­ former, is preferred for the following reasons: a. Instrument transformers, their enclosures, and connections are more capable of withstanding the effects of voltage rise than control board compo­ nents. b. The increased use of sensitive solid-state devices in instrument transformer secondary circuits re­ quires that voltage levels in the control boards be limited. c. It provides the maximum protection for personnel at the point where they are most apt to be exposed to circuit overvoltages, the control board. We are aware that instrument transformer second­ ary grounding is not in accordance with the above recommendations at some Reclamation facilities."
+      },
+      {
+        "id": "S2",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "1. The instrument transformer secondary circuit",
+        "pages": "18",
+        "text": "should be connected to the station ground at only one point. This holds true regardless of the number of instrument transformer secondary windings con­ nected to the circuit. The reasons for grounding at a single point are as follows: a. The flow of fault current through the ground mat can cause potential differences at different points in the ground mat. If the instrument transformer sec­ ondary circuit is grounded at more than one loca­ tion, these potential differences can result in the flow of current through the relay, instrument, and meter coils resulting in instrument inaccuracies and possible relay misoperation. Also, high neutral conductor currents resulting from multiple ground connections can cause thermal damage to the neutral conductor. b. The use of a single grounding point facilitates the temporary removal and re-establishment of the ground connection when desired in order to test for insulation deterioration or accidental grounds in the instrument transformer secondary circuit. 2. The point of grounding in the instrument transformer secondary circuit should be at the control board or the first point of application."
+      },
+      {
+        "id": "S3",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-22",
+        "pages": "16-18",
+        "text": "With reenergizing of the circuit a current path can easily be established over this short distance at 115-kV. A fuse conducting rod that fails to eject provides no protection whatsoever. The fuse is fitted with a disc over the bottom of the tube that is supposed to keep out dirt and presumably moisture, yet be fragile enough to allow ejecting of the conducting rod when the fuse link melts. However, in service these discs generally do not stay in place. They drop off within a relatively short time in most cases. It is recommended that fuses with similar operating mechanisms be thoroughly inspected on an annual basis with particular attention given to operability of fuse ejection features. (FIST 3-22 6/91) 2 Instrument Transformer Secondary Grounding ANSI C57.13.3 - Guide for the Grounding of Instru­ ment Transformer Secondary Circuits and Cases, contains the following important grounding require­ ments: should be connected to the station ground at only one point. This holds true regardless of the number of instrument transformer secondary windings con­ nected to the circuit."
+      },
+      {
+        "id": "S4",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "1. The instrument transformer secondary circuit",
+        "pages": "18-20",
+        "text": "We are aware that instrument transformer second­ ary grounding is not in accordance with the above recommendations at some Reclamation facilities. In some cases the arrangement of the secondary wind­ ings or devices in the circuit makes it necessary to ground at some point other than the control board in order to obtain correct equipment performance; however, all other instrument transformer secondary circuits that do not conform with the recommended grounding practices should, when feasible, be modified to be in compliance. Please contact D-8440, Denver, Office, if you need assistance in this process. 1 (FIST 3-23 6/91) Overload Protection of Three-phase Motors Since the early 1960's, most Reclamation power installations have been designed and constructed utilizing 3-phase overload protection for all 3-phase motors powering auxiliary equipment. Prior to 1960, most 3-phase auxiliary equipment was provided with 2-phase overload protection only. The accompanying article, reprinted for this volume by permission from plant Engineering Magazine. explains why 3-phase protection is now required by the National Electrical Code."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-28. Short-circuiting dangers.",
+        "pages": "25-26",
+        "text": "A current transformer, being a constant-current device, requires that the secondary circuit always be closed. As long as there is current in the primary winding, there will be current in the secondary winding. On an open circuit the voltage will be the secondary current multiplied by an extremely high open-circuit secondary resistance. This is a voltage which may both damage insulation and prove dangerous to life. Under no circumstances should the secondary of a current transformer be opened while the primary circuit of the transformer is energized, unless the terminals of the current transformer are of th e shortcircuiting type. Instrument transformers should be scheduled for a maintenance inspection every 2 years. In addition, they should be inspected visually any tim e appara3-7 tus with which they are associated is inspected, but not less than every 6 months. a. Safety. Before performing any maintenance on instrument transformers, they must be deenergized and completely isolated from any energized source .Isolation may be accomplished by opening applicable disconnect switches or fuses or by de-energizing appropriate circuit breakers."
+      }
+    ]
+  }
+]

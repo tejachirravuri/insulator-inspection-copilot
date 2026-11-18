@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How frequently should a substation be checked by eye and with a thermal camera?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"substation visual inspection frequency\"\n}",
+    "result_summary": "5 passages: S1 p.94-95, S2 p.19, S3 p.19, S4 p.183-184, S5 p.18-19",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"infrared thermography inspection interval substation\"\n}",
+    "result_summary": "5 passages: S6 p.19, S7 p.19-20, S8 p.20-21, S9 p.183-184, S10 p.20",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "TM 5-684 recommends a **visual inspection every month** and an **infrared (thermal) inspection once a year**, both covering the whole substation [S2].\n\n**Visual inspection**\n- Cover the whole site: the yard, the control house, and all equipment and structures [S2].\n- If the substation is energized, inspect from ground level so you stay clear of live parts. Use binoculars for buses and other equipment up on structures [S3].\n- Never remove ground connections while the substation is energized [S3].\n- Use a checklist written for that specific substation, and keep records so defects you can't fix right away still get corrected [S2].\n\n**Infrared inspection**\n- It finds loose connections, overloaded conductors and local overheating before they become serious. You can scan bare bus, disconnect switches and connections from a distance without de-energizing them [S3].\n- Scan only after you've checked the visual and mechanical condition [S10].\n- If you find hot spots, report where they are, how many degrees they are above a 30 °C reference, and the likely cause. The equipment must be able to detect a 1 °C rise [S10].\n- The Bureau of Reclamation manual strongly recommends IR scanning as regular scheduled maintenance. It says operators should be trained, ideally certified Level 1 thermographers or higher [S8].\n\n**When to change the intervals:** inspect more often if the equipment is critical, heavily loaded, operated by hand or used only now and then [S5].\n\nThese manuals are older US documents (TM 5-684 is from 1996). If you work under EU or German rules, check the intervals against current standards and your utility's own maintenance rules."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "7-3. Transformer classification.",
+        "pages": "94-95",
+        "text": "A primary unit substation has a mediumvoltage secondary. A secondary unit substation has a low-voltage secondary. (6) Other types . These include submersible, subway, vault-type, network, sub-surface, and direct-buried units. frequencies. Transformers are simple rugged devices which will give many years of trouble-free operation i f provided with periodic inspections and maintenance. Inspections of transformers should be mad e regu7-2 larly and permanent records kept of all observations and tests for both scheduled and unscheduled inspections. The frequency of inspection should be based on the importance of the transformer, the operating environment, and the severity of the loading conditions. In addition to the inspectio n recom- _mendations listed herein, it is good practice to develop a habit of visual inspection whenever a transformer area is visited. In this way leaks, cracked insulators, loose connections, and similar problems may be noticed before serious problems develop that might affect the continuity of service."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-3. Substation safety concerns.",
+        "pages": "19",
+        "text": "Access to safeguards such as danger signs, temporary barriers, protective clothing, tools and protective equipment, and all safety manuals and rules. Procedures should clearly indicate insulating requirements and working clearances for any category of energized-line maintenance employed. d. Keeping proper inspection records and checklists so that observed defects or improper conditions not immediately repairable will be promptly corrected. In addition to the personnel safety hazards mentioned above, an electrical substation presents an attraction to would-be vandals, dissidents, or other belligerents. For these reasons, good security is a basic requirement. All means of access to substations, including buildings and yards, will be kept locked when unoccupied and secure when occupied by authorized personnel. An inspection checklist, tailored to a specific substation and containing all items to be checked, is recommended. Monthly visual and yearly infrared inspections of the entire substation are recommended. Visual inspections should include the total substation area including the site, the control house, and all equipment and structures. The energized substation should be inspected from ground level, to ensure adequate safety clearances from energized parts."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-6. Visual inspections of substations.",
+        "pages": "19",
+        "text": "Visual inspections should include the total substation area including the site, the control house, and all equipment and structures. The energized substation should be inspected from ground level, to ensure adequate safety clearances from energized parts. Binoculars should be used to view buses and other equipment located on structures. Special care should be used when ground connections are checked, since a high voltage could develop across any gap created between a ground cable and a piece of equipment, particularly under fault conditions. For this reason, ground connections shall not be removed for any reason while the substation is energized. All matter emits infrared rays in proportion to its temperature. a. Method. An infrared detecting device can be used to determine loose connections, overloading of conductors, localized overheating in equipment, or similar conditions before they become serious. Some equipment is sensitive to a fraction of a degree. Infrared inspection can be done from a distance, since contact with the item being measured is not required. Substation equipment, such as bare bus, disconnect switches, and connections, can be checked without being de-energized."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II-SCHEDULES",
+        "pages": "183-184",
+        "text": "Grounds Guys and anchors Hardware Instruments and meters-inspection Instruments and meters-tests Insulating liquids Insulators, distribution Insulators, substation Interference, electromagnetic Interference, harmonic Lamps Leathergoods Lightning protection shielding devices Luminaires Manholes Meters and instruments-inspection Meters and instruments-tests Poles,woodd Poles,metal Poles,concrete Portable or mobile substations Potheadss Reclosers, automatic circuit Regulator,voltage Relays Relay settings Resistors, bypass Rubber good s Servicedrop Streetlighting fixtures Streetlighting lamps Streetlighting photocells Streetlighting protective relays Streetlighting primary oil switch Substation fence and gate Substation signs Substation yard Substation overall, infrared Substation overall, visual Switch, load interrupter Switch, photoelectric 8-8.a l0-4,10-6 4-52c Table 7-l 4-5 lc 5.9 4-16.b 15-26c 7-2.b(2) 11-4.b 11-4.b Figure 4-13 6-8.c 6-14.a 6-14.b 3-16.c 8-9.c(2),8-11 6-8.C Table 17-l."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "2-5. Frequency of inspection.",
+        "pages": "18-19",
+        "text": "The frequency of inspection may vary for similar equipment operating under different conditions. Critical equipment, heavily loaded apparatus, operator handled, and intermittently operated units are examples of different operating conditions. - - TRANSMISSION AND DISTRIBUTION SUBSTATIONS This chapter includes a transmission and distribution substation which is an assemblage of equipment for purposes other than generation or utilization, through which electrical energy in bulk is passed for the purpose of switching or modifying its characteristics. A substation is an integral and vital part of an electrical system. It does not exist independently of the rest of the system, though it is usually designed so that a failure of a single component will not interrupt loads, except for switching times. Such interruption may force greater than normal loads to be carried by other components of the station while repairs are being made. Most substations are designed so they do not require attendant personnel on a continuous basis. Supervisory control and data acquisition (SCADA) systems, where provided, allow monitoring at a central point."
+      },
+      {
+        "id": "S6",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-6. Visual inspections of substations.",
+        "pages": "19",
+        "text": "Visual inspections should include the total substation area including the site, the control house, and all equipment and structures. The energized substation should be inspected from ground level, to ensure adequate safety clearances from energized parts. Binoculars should be used to view buses and other equipment located on structures. Special care should be used when ground connections are checked, since a high voltage could develop across any gap created between a ground cable and a piece of equipment, particularly under fault conditions. For this reason, ground connections shall not be removed for any reason while the substation is energized. All matter emits infrared rays in proportion to its temperature. a. Method. An infrared detecting device can be used to determine loose connections, overloading of conductors, localized overheating in equipment, or similar conditions before they become serious. Some equipment is sensitive to a fraction of a degree. Infrared inspection can be done from a distance, since contact with the item being measured is not required. Substation equipment, such as bare bus, disconnect switches, and connections, can be checked without being de-energized."
+      },
+      {
+        "id": "S7",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-7. Infrared inspections of substations.",
+        "pages": "19-20",
+        "text": "Infrared inspection can be done from a distance, since contact with the item being measured is not required. Substation equipment, such as bare bus, disconnect switches, and connections, can be checked without being de-energized. The inspection is made by aiming the infrared detector at various areas of the substation and noting where the hot spots are. 3-l b. Equipment. Several types of infrared detectors are available. These vary from a simple hand-held instrument similar to a gun, through which the operator can detect hot spots and note their locations, to complex equipment requiring qualified operators and product photographs as a permanent record of the area being checked. The simpler detectors are usually sold outright, while the complex items are usually used by infrared detection services which contract to do the work. Having an instrument readily available can be justified for a large installation with several substations, while a contract to have a survey performed would probably be better for a small installation."
+      },
+      {
+        "id": "S8",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "1.3.2 Infrared Scanning",
+        "pages": "20-21",
+        "text": "It can be used not only for electrical equipment but also to detect mechanical and structural problems. Therefore, infrared scanning is HIGHLY recommended as a regularly scheduled maintenance procedure. Effective infrared scanning and analysis require the following: • The scanning equipment (IR camera and accessories) must be high quality and correctly maintained and calibrated. • The IR camera operator must be trained to use the equipment and deal with complicating issues such as differing emissivities of surfaces and reflectivity. Certified Level 1 Thermographer (e.g., Academy of IR Thermography) credentials, or higher, are recommended. • The IR system operator must be able to analyze results using state-of-the-art software critical to successful interpretation of problems. • Experiences in the field have shown that technical knowledge of the equipment being scanned is highly desirable. Field offices with adequate resources may find it possible to achieve professional results by operating a local IR program. Others may find it more cost effective to hire a contractor or use the resources in the Hydroelectric Research and Technical Services Group (D-8450). Call 303-445-2300 for more information."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II-SCHEDULES",
+        "pages": "183-184",
+        "text": "Grounds Guys and anchors Hardware Instruments and meters-inspection Instruments and meters-tests Insulating liquids Insulators, distribution Insulators, substation Interference, electromagnetic Interference, harmonic Lamps Leathergoods Lightning protection shielding devices Luminaires Manholes Meters and instruments-inspection Meters and instruments-tests Poles,woodd Poles,metal Poles,concrete Portable or mobile substations Potheadss Reclosers, automatic circuit Regulator,voltage Relays Relay settings Resistors, bypass Rubber good s Servicedrop Streetlighting fixtures Streetlighting lamps Streetlighting photocells Streetlighting protective relays Streetlighting primary oil switch Substation fence and gate Substation signs Substation yard Substation overall, infrared Substation overall, visual Switch, load interrupter Switch, photoelectric 8-8.a l0-4,10-6 4-52c Table 7-l 4-5 lc 5.9 4-16.b 15-26c 7-2.b(2) 11-4.b 11-4.b Figure 4-13 6-8.c 6-14.a 6-14.b 3-16.c 8-9.c(2),8-11 6-8.C Table 17-l."
+      },
+      {
+        "id": "S10",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-7. Infrared inspections of substations.",
+        "pages": "20",
+        "text": "Having an instrument readily available can be justified for a large installation with several substations, while a contract to have a survey performed would probably be better for a small installation. However, as a low cost alternative, a camera with infrared sensitive film may be used, or a self-calibrating portable indicating unit can be coordinated with a Polaroid camera. c. Surveys. When infrared (thermographic) surveys are made, the equipment to be scanned must be identified. Scanning should be made after visual and mechanical conditions have been observed. Report all areas scanned. (1) Reports. If hot spots are found the report should locate the problem area and the temperature rise above a reference 30 degrees C. The cause of the heat rise should be identified such as phase unbalance, overload, poor connections, or other heat producing conditions. -.- (2) Test parameters . Equipment must detect emitted radiation and convert to a visual signal. A detection ability of a one degree C rise between the hot spot area and the 30 degree reference area is required. (3) Hot spot indications ."
+      }
+    ]
+  }
+]

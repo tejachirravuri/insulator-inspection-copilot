@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What is the annual failure rate of glass cap-and-pin insulators in European transmission grids?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"glass cap-and-pin insulator failure rate\"\n}",
+    "result_summary": "5 passages: S1 p.25-27, S2 p.22-23, S3 p.22, S4 p.22, S5 p.185-186",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "I can't give you that figure. The manuals in my knowledge base don't include any annual failure rate for glass cap-and-pin insulators, whether in Europe or anywhere else.\n\n**What the manuals do cover:**\n- Glass insulators come in two materials, wet-process porcelain or toughened glass, and the manual describes how glass ones are made [S4], [S3].\n- **Inspection:** look for fractures, chips and dirt or salt deposits. Check for cracks by tapping gently, only when the line is de-energized. A good insulator rings, and a cracked one sounds dull [S3].\n- **Repair:** replace any cracked pin or post insulator immediately. Losing a skirt cuts its insulation value by 30% or more [S2], [S3].\n- Reclamation has a record of pedestal-type (pin and cap) insulators failing on 12.47–69 kV substation buses since 1962. It describes these failures but gives no rate [S1].\n\n**Bigger limitation:** these are older US federal documents (US Army TM 5-684 from 1996, Bureau of Reclamation FIST manuals from 2000–2005). They don't cover European grids or current EU/German standards such as DIN EN / IEC.\n\n**Where to look for European failure rates:**\n- CIGRE technical brochures on line insulator service experience\n- Reports from ENTSO-E or the national grid operators\n- Reliability data from manufacturers\n\nToughened glass shatters when it fails, so failed units are easy to spot from the ground or a drone. Because of that, published figures are usually given as shattered units per year per 10,000 installed."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "25-27",
+        "text": "B2 will be found grounded if the capacitor is used only with a potential device. 5. Test as follows: To Measure Energize Ground Guard UST C(T2-T1) B1 =T2 T1 B3 ** - C(B1-B3) B1 = T2 T1 - B3 C(B1-B2) B1 =T2 T1 - B2 C(B3-B2) B3 * T1 - B2 *Test voltage not to exceed rating of Tap or Auxiliary Capacitor. **To make certain that all the current in the parallel circuit will be subtracted from the meter reading, vary the procedure slightly in that after applying the safety ground and closing the ground switches, disconnect the capacitor from the power line and test C(T2-T1) by energizing T2 and UST T1. (FIST 3-25 6/91) 2 Failures of Pedestal-type (Pin and Cap) Insulators The problem of failure of pedestal-type insulators first appeared on a 34.5-kV bus at a Reclamation substation in 1962. Since that time, similar failures have occurred on 12.47-kV, 34.5-kV, 41.8-kV, and 69­ kV bus Installations at many other locations."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22-23",
+        "text": "To avoid damaging good insulators, tap them; do not hit them hard. (3) Repair. (a) If the main body of a pin type or post insulator is cracked, replace it immediately. (b) Hone small chips from shells or skirts, and paint with an insulating paint or varnish to provide a glossy finish and to lessen dirt accumulation. (c) Since the loss of a skirt on a pin-type insulator reduces the insulation value of the insulator by 30 percent or more, replace such broken units. b. Nonceramic insulators. Nonceramic or composite insulators include core, weathersheds, and metal-end fittings. A weathershed is the external part of the insulator that protects the core or mechanical load-bearing component and provides the wet electrical strength and leakage distance. The core consists of resin and glass fibers. The weathersheds are of polymeric materials such as epoxy resins or elastomers and normally contain inorganic fillers. Since the insulating qualities of insulators, and their ability to prevent flashovers, depend on preventing contamination buildup, cleaning frequencies will depend on the location."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22",
+        "text": "The glossy surface of the glaze makes the insulator surface self-cleaning. Large porcelain insulators are made up of several shapes cemented together. A chemical reaction on the metal parts from improper cementing can result in a cement growth which can be sufficiently stressful to crack the porcelain. (b) Glas sinsulators..Glass insulators are made from a mixture of sand, soda ash, and lime which is mixed and melted in an oven, then molded, cooled, and annealed. (2) Inspection. (a) Look for fractures, chips, deposits of dirt, salt, cement dust, acid fumes, or foreign matter, which under moist conditions may cause a flashover. (b) Check f or cracks in insulators by tapping gently with a small metal object ONLY WHE N DEENERGIZED, about the size of a 6-inch (15 centimeter) wrench. Insulators free of cracks emit a ringing sound when tapped; cracked ones sound dull and hollow. To avoid damaging good insulators, tap them; do not hit them hard. (3) Repair. (a) If the main body of a pin type or post insulator is cracked, replace it immediately."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22",
+        "text": "This is because the several pieces of porcelain and hardware, assembled in a single unit, are usually located at key positions in the systems, where failure is extremely serious. Switch-and-bus insulator failures occur when porcelain is thrown in tension by any thermal movement between nested parts, which can cause cracking and allow the entrance of moisture. An accumulation of foreign deposits, and mechanical damage from external sources also cause deterioration. Evidence of such impairments may cause a flashover puncture accompanied by a destruction of insulator parts. Workers should be CAUTIONED that equipment must be de-energized unless the procedure in chapter 4, section XV is authorized. a. Ceramic insulators . Ceramic insulators are made of wet-process porcelain or toughened glass. (1) Construction. (a) Porcelain insulators. Porcelain insulators are manufactured from special clays to produce a plastic-like compound which is molded, oven dried, dipped in a colored glazing solution, and fired in a kiln. The glossy surface of the glaze makes the insulator surface self-cleaning. Large porcelain insulators are made up of several shapes cemented together."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "APPENDIX A",
+        "pages": "185-186",
+        "text": "Nongovernment Publications American Association of State Highway an d Transportation Officials (ASSHTO). 444 N. Capitol Street NW, Washington, DC 20001 AASHTO Division II. 13.2 Painting Metal Structures. A-l American National Standards Institute (ANSI). 11 West 42nd Street, New York, NY 10036 ANSI c2 ANSI c29.2 ANSI c29.5 ANSI C29.6 ANSI c29.7 ANSI C84.1 ANSI c119.4 ANSI 05.1 ANSI 289.1 ANSI 2133.1 ANSI/IEEE 18 ANSI/IEEE 48 ANSI/IEEE 80 ANSI/IEEE 81 ANSI/IEEE 400 ANSI/IEEE 450 ANSI/IEEE 516 ANSI/IEEE 935 ANSI/IEEE 957 ANSI/IEEE 1106 ANSI/IEEE C367.60 ANSI C37.6l/IEEE 321 ANSI/IEEE C37.90 ANSI/IEEE C57.12.80 A-2 National Electrical Safety Code. Insulators, Wet-Process Porcelain and Toughened Glass, Suspension Type. Wet-Process Porcelain Insulators, Low- and Medium-Voltage Types. Wet-Process Porcelain Insulators, High-Voltage Pin Type. Wet-Process Porcelain Insulators, High-Voltage Line-Post Type. Electric Power Systems and Equipment, Voltage Rating s (60-Hertz). Electric Connectors, Connectors for Use Betwee n Aluminum-toAluminum or Aluminum-to-Copper Bare Overhead Conductors. Wood Poles, Specifications and Dimensions Personal Protection, Protectiv e Headwear for Industrial Workers, Requirements. Tree Care Operations, Pruning, Trimming, Repairing, Maintaining, and Removing Trees, and Cutting Brush, Safety Requirements. Standard for Shunt Power Capacitors."
+      }
+    ]
+  }
+]

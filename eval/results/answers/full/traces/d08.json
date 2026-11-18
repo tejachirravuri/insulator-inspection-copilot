@@ -1,0 +1,32 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How many inspections are there per insulator type?"
+  },
+  {
+    "role": "tool_call",
+    "name": "list_inspections",
+    "content": "{}",
+    "result_summary": "15 inspections",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "fleet_statistics",
+    "content": "{}",
+    "result_summary": "15 images, 38 detections",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "There are 15 inspected images: 9 glass, 3 composite and 3 porcelain.\n\n| Insulator type | Inspections | Image IDs | Detections | Flagged for review |\n|---|---|---|---|---|\n| Glass | 9 | 1, 2, 3, 4, 11, 12, 13, 14, 15 | 31 | 11 |\n| Composite | 3 | 8, 9, 10 | 4 | 0 |\n| Porcelain | 3 | 5, 6, 7 | 3 | 0 |\n| **Total** | **15** | | **38** | **11** |\n\n- **Glass makes up most of the data.** It has 9 of the 15 images and 31 of the 38 detections. Image 13 (glass) had no detections at all.\n- **All 11 detections that need a human check are on glass images:** image 3 (4 flagged), image 14 (3) and image 15 (4). A qualified person needs to confirm these."
+  },
+  {
+    "role": "sources",
+    "content": []
+  }
+]

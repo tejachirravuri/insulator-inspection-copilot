@@ -1,0 +1,58 @@
+{
+  "cases": 36,
+  "manual": {
+    "evidence_retrieved": {
+      "mean": 1.0,
+      "ci95": 0.0,
+      "n": 24
+    },
+    "evidence_cited": {
+      "mean": 1.0,
+      "ci95": 0.0,
+      "n": 24
+    },
+    "correctness": {
+      "mean": 1.0,
+      "ci95": 0.0,
+      "n": 24
+    },
+    "faithful": {
+      "mean": 0.25,
+      "ci95": 0.177,
+      "n": 24
+    },
+    "unsupported_claims": {
+      "mean": 1.75,
+      "ci95": 0.569,
+      "n": 24
+    }
+  },
+  "data": {
+    "numbers_match": {
+      "mean": 1.0,
+      "ci95": 0.0,
+      "n": 8
+    },
+    "right_tool": {
+      "mean": 1.0,
+      "ci95": 0.0,
+      "n": 8
+    }
+  },
+  "out_of_scope": {
+    "declined": {
+      "mean": 1.0,
+      "ci95": 0.0,
+      "n": 4
+    }
+  },
+  "cost_usd_total": 1.4887,
+  "cost_usd_per_case": {
+    "min": 0.0157,
+    "median": 0.0416,
+    "max": 0.0713
+  },
+  "latency_s_median": 9.4,
+  "tool_calls_median": 1.0,
+  "judge_model": "claude-sonnet-5-5"
+}

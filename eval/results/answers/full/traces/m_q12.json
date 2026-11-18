@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Why would a utility pick polymer units for lines in remote rural regions?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"polymer insulators advantages remote areas vandalism weight\"\n}",
+    "result_summary": "5 passages: S1 p.23, S2 p.190, S3 p.23, S4 p.53, S5 p.23-24",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"nonceramic composite insulator benefits lightweight breakage handling\"\n}",
+    "result_summary": "5 passages: S6 p.22-23, S7 p.23, S8 p.23-24, S9 p.58-59, S10 p.23",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "According to the manuals, the main reason is **resistance to vandalism by gunfire**. Composite (polymer) insulators are often used in outlying areas where people shooting at insulators is a problem [S1].\n\n**Why they hold up better**\n- A few bullet holes through the weathersheds alone have little or no effect on how the insulator performs [S1].\n- They have excellent mechanical and dielectric strength, don't track, and don't carbonize under severe arcing. They're also very durable in harsh conditions [S10]. (The manual says this about Polysil-type units.)\n- Construction: a load-bearing core of resin and glass fibre, covered by polymer weathersheds [S6].\n\n**Things to watch on these units**\n- Bullet damage isn't always easy to see [S1]. Replace damaged units as soon as practical, especially if there's metal embedded in the shank [S1].\n- The surface breaks down over time. Proper cleaning helps them last longer [S10].\n- Don't grease them. Greasing can cause tracking on composite insulators [S5].\n- Many weathershed materials aren't suitable near hydrocarbon vapours, or where they touch wood poles treated with hydrocarbons [S5].\n\n**Limits of the sources**\n- The manuals don't discuss lighter weight, easier handling and installation, or cost. Those are common reasons utilities choose polymer units, but I can't back them up from this knowledge base.\n- The source is a 1996 US Army manual (TM 5-684). For current practice, especially in the EU or Germany, check standards like IEC 61109 or DIN EN 61109 and manufacturer data."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "Insulators have excellent mechanical and dielectric strength, ar e nontracking, and do not carbonize under severe arcing conditions. They are very durable for use in an adverse atmosphere. Polysil was developed by the Electric Power Research Institute (EPRI). (2) Inspection and replacement . Composite insulators are frequently used in outlying areas where shooting vandalism is a problem. Damage to nonceramic insulators, particularly from small arms ammunition, may not always be easily detected visually. When such damage is detected, the damaged insulators should be replaced as soon as practical, especially if embedded metal is found in the shank of the insulator. A few holes through only the weathersheds will have little or no adverse effect on the performance of the insulator. c. Metal parts. Metal parts consist of fittings that connect the insulator at one end to the support and at the other end to the conductor. (1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "APPENDIX C ADDITIONAL WOOD POLE DATA",
+        "pages": "190",
+        "text": "Local conditions will have a direct influence on the speed of decay and directly affect the mechanical strength of poles. Pole strengths must be maintained above definite minimum requirements to meet safety requirements. a. Adequate strength. Poles must be maintained at all times to withstand the applicable loads resulting from the conductors and equipment weights carried, as well as the influence of weather conditions. In the United States, three loading districts based on weather conditions are recognized by the NESC. These loading districts are designated as light, medium, and heavy. Loading districts are indicated on the general loading map of the United States contained in the NESC. b. Cause of damaging actions to wood poles . Insects and other pests can attack poles in most geographical areas. Termites, wood-boring beetles, and even carpenter bees and ants, may cause serious damage. Poles that are heavily infested with insects attract wood-damaging birds, such as woodpeckers. Fire and improper handling of poles during installation or maintenance can also cause damage. (1) Termites and other insect damage. (a) Termites."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "(1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination. However, alternate wetting by early morning mist and fog, followed by exposure to dust and wind, can build up harmful deposits. Special contamination problems are encountered near steel mills, cement and chemical plants, and other factories that saturate the air with finely divided, semi-conductive particles. Along coastal areas, salt deposits build up and materially reduce the flashover value. Many of these deposits are extremely tenacious, requiring that the insulator be removed from service and cleaned by hand. Where contamination is serious, specia l longleakage suspension insulators for high-voltage lines have been used; but, where severe deposits occur, washing of special insulators is required as often as for standard insulators. To lengthen maintenance intervals, in areas where contamination is severe, ceramic insulators and bushings may be coated with special silicone greases."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-46. Types of pole-line insulators.",
+        "pages": "53",
+        "text": "Line posts are stronger, more resistant to vandalism, and inherently mor e radiointerference free than pin insulators. Post insulators can be provided with clamp tops or tie tops. Tie tops cannot be used for angles of more than 15 degrees. For some mountings and loadings they can only be used for angles up to 2 degrees. Tie tops are less expensive, but clamp tops eliminate both tie wire material and labor costs, resulting in an easier installation. -- c. Suspension insulators . Suspension insulators (dead-end bells) are used for primary lines, where pin or post insulators do not provide the required strength. They may also be referred to as strain insulators where lines are dead-ended at corners, where there are sharp curves or extra long spans, and at other places where a pull must be carried as well as insulation provided. d. Spool insulators. Spool insulators are used on secondary racks or clevises, as required to support secondary cables, and require tie wires."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23-24",
+        "text": "To lengthen maintenance intervals, in areas where contamination is severe, ceramic insulators and bushings may be coated with special silicone greases. Greasing is not recommended for nonceramic insulators, a channeled arcing can lead to tracking on greased composite insulators. Many weathershed materials are unsuitable in areas where hydrocarbon vapors are prevalent or where they come in contact with wood poles treated with hydrocarbons. b. De-energized cleaning methods an d materials for ceramic insulators. The following materials and methods are specified for porcelain cleaning. Table 3-2 should also be consulted. (1) Clean, grit-free , lintless wipers should be used. (a) Wire-brush rusty spots down to bare metal. Apply priming coat of paint and dry. Apply (2) An abrasive, of the kitchen-cleanser type, finish coat of paint to spots covered with primer. mixed with clear water to the consistency of a thick paste, may be applied with a wiper or stiff-bristle (b) Replace insulator if loose cement permits brush. The amount of rubbing depends on the mamovement between porcelain and metal parts. terial being removed. Rinse freely with clear water. Table 3-2."
+      },
+      {
+        "id": "S6",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22-23",
+        "text": "To avoid damaging good insulators, tap them; do not hit them hard. (3) Repair. (a) If the main body of a pin type or post insulator is cracked, replace it immediately. (b) Hone small chips from shells or skirts, and paint with an insulating paint or varnish to provide a glossy finish and to lessen dirt accumulation. (c) Since the loss of a skirt on a pin-type insulator reduces the insulation value of the insulator by 30 percent or more, replace such broken units. b. Nonceramic insulators. Nonceramic or composite insulators include core, weathersheds, and metal-end fittings. A weathershed is the external part of the insulator that protects the core or mechanical load-bearing component and provides the wet electrical strength and leakage distance. The core consists of resin and glass fibers. The weathersheds are of polymeric materials such as epoxy resins or elastomers and normally contain inorganic fillers. Since the insulating qualities of insulators, and their ability to prevent flashovers, depend on preventing contamination buildup, cleaning frequencies will depend on the location."
+      },
+      {
+        "id": "S7",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "Insulators have excellent mechanical and dielectric strength, ar e nontracking, and do not carbonize under severe arcing conditions. They are very durable for use in an adverse atmosphere. Polysil was developed by the Electric Power Research Institute (EPRI). (2) Inspection and replacement . Composite insulators are frequently used in outlying areas where shooting vandalism is a problem. Damage to nonceramic insulators, particularly from small arms ammunition, may not always be easily detected visually. When such damage is detected, the damaged insulators should be replaced as soon as practical, especially if embedded metal is found in the shank of the insulator. A few holes through only the weathersheds will have little or no adverse effect on the performance of the insulator. c. Metal parts. Metal parts consist of fittings that connect the insulator at one end to the support and at the other end to the conductor. (1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination."
+      },
+      {
+        "id": "S8",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23-24",
+        "text": "To lengthen maintenance intervals, in areas where contamination is severe, ceramic insulators and bushings may be coated with special silicone greases. Greasing is not recommended for nonceramic insulators, a channeled arcing can lead to tracking on greased composite insulators. Many weathershed materials are unsuitable in areas where hydrocarbon vapors are prevalent or where they come in contact with wood poles treated with hydrocarbons. b. De-energized cleaning methods an d materials for ceramic insulators. The following materials and methods are specified for porcelain cleaning. Table 3-2 should also be consulted. (1) Clean, grit-free , lintless wipers should be used. (a) Wire-brush rusty spots down to bare metal. Apply priming coat of paint and dry. Apply (2) An abrasive, of the kitchen-cleanser type, finish coat of paint to spots covered with primer. mixed with clear water to the consistency of a thick paste, may be applied with a wiper or stiff-bristle (b) Replace insulator if loose cement permits brush. The amount of rubbing depends on the mamovement between porcelain and metal parts. terial being removed. Rinse freely with clear water. Table 3-2."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-52. Guy strain insulators.",
+        "pages": "58-59",
+        "text": "Install proper protective equipment on adjacent grounded guys while the lineman is working on or near energized conductors. Ungrounded guys are insulated with porcelain, wood, fiberglass, or other materials of suitable mechanical and electrical properties. TM5-684/NAVFAC MO-200/AFJMAN 32-1082 SQUARE ~HR0UCt-i eoL 1s DETAIL OF POLE ;\\TTACHMENT (USE LINE POLE) V lin(25mm) Figure 4-21. Wood-pol e push brace a. Porcelain. Porcelain guy strain insulators are usually of the interlocked (Johnny ball) type. The porcelain is in compression. If breakage occurs the guy is relaxed, but, due to the interlinkage, does not part. In replacing the insulator, consideration should be given to the cause of failure. If the broken insulator was too small, replace with a larger and stronger one. b. Wood. Wood guy insulators may have been installed, particularly on higher voltage lines, because of their superior impulse resistance. The size and length of the wood member used would have depended on the strength required and the voltage of the circuit. The wood should have been treated with a nonconducting preservative."
+      },
+      {
+        "id": "S10",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "Since the insulating qualities of insulators, and their ability to prevent flashovers, depend on preventing contamination buildup, cleaning frequencies will depend on the location. Ceramic insulators must maintain their glass-like glaze and care must be taken in cleaning to prevent this smooth surface from being scratched or dulled. Nonceramic insulators will deteriorate with time as the surface decomposes, although proper cleaning will help to extend their service life. For convenience, safety and thoroughness, insulators should be cleaned while out of service. (1) Construction. (a) Fiberglass . Fiberglass insulators are manufactured with rods of fiberglass treated with epoxy resins. Rubber-like compounds are applied to the rods to fabricate suspension, dead-end, and post-type insulators. (b) Polysil. Polysil insulators are formed by using various sizes of silica bound together chemically with a resin into a compound which is approximately 90 percent silica. Insulators have excellent mechanical and dielectric strength, ar e nontracking, and do not carbonize under severe arcing conditions. They are very durable for use in an adverse atmosphere. Polysil was developed by the Electric Power Research Institute (EPRI)."
+      }
+    ]
+  }
+]

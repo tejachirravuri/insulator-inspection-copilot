@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Why do pedestal-type (pin and cap) insulators fail?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"pedestal insulator pin and cap failure causes\"\n}",
+    "result_summary": "5 passages: S1 p.25-27, S2 p.27, S3 p.27-29, S4 p.137, S5 p.22",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "The main cause is **cement growth**. The cement that holds the metal cap onto the porcelain expands over time and pushes the cap off the porcelain [S2].\n\n**What the Bureau of Reclamation reported (FIST 3-26):**\n- **First seen:** The problem first appeared in 1962 on a 34.5-kV bus at a Reclamation substation. Later failures followed on 12.47, 34.5, 41.8 and 69 kV bus installations at many other sites [S1][S2].\n- **Most at risk:** Insulators mounted **horizontally**, either as bus supports or as supports for hook-stick-operated disconnect switches [S2].\n- **Likely trigger:** Moisture and **freeze-thaw cycles**, especially in northern areas. The authors believed the problem could also exist at southern sites [S2][S3].\n- **Possible batch issue:** All the pedestal insulators replaced in those programs had been bought under a single specification when the system was first built [S2].\n\n**What they recommended:**\n- Look through your insulator failure records and carefully examine pedestal insulators, especially horizontal ones used as switch supports [S3].\n- Where defects show up, plan to replace them with **post-type insulators**. Post types have much higher cantilever strength (resistance to sideways bending) and did not seem to suffer from cement growth. The manual calls this the only satisfactory fix [S2][S3].\n\n**Note:** This is a short 1991 Bureau of Reclamation bulletin, reprinted in 2000. It does not cover current EU/German standards such as DIN EN / IEC."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "25-27",
+        "text": "B2 will be found grounded if the capacitor is used only with a potential device. 5. Test as follows: To Measure Energize Ground Guard UST C(T2-T1) B1 =T2 T1 B3 ** - C(B1-B3) B1 = T2 T1 - B3 C(B1-B2) B1 =T2 T1 - B2 C(B3-B2) B3 * T1 - B2 *Test voltage not to exceed rating of Tap or Auxiliary Capacitor. **To make certain that all the current in the parallel circuit will be subtracted from the meter reading, vary the procedure slightly in that after applying the safety ground and closing the ground switches, disconnect the capacitor from the power line and test C(T2-T1) by energizing T2 and UST T1. (FIST 3-25 6/91) 2 Failures of Pedestal-type (Pin and Cap) Insulators The problem of failure of pedestal-type insulators first appeared on a 34.5-kV bus at a Reclamation substation in 1962. Since that time, similar failures have occurred on 12.47-kV, 34.5-kV, 41.8-kV, and 69­ kV bus Installations at many other locations."
+      },
+      {
+        "id": "S2",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-26 FAILURES OF PEDESTAL-TYPE (PIN AND CAP) INSULATORS",
+        "pages": "27",
+        "text": "Since that time, similar failures have occurred on 12.47-kV, 34.5-kV, 41.8-kV, and 69­ kV bus Installations at many other locations. These failures, which are apparently due to cement growth causing the cap to separate from the porcelain, occur most often where the pedestal-type insulators are mounted in a horizontal position, either as bus supports or as supports for hook-stick-operated disconnect switches. The only satisfactory solution to this problem has been to replace all pedestal-type insulators with post-type insulators, which not only have a much higher cantilever strength but also do not seem to be affected by cement growth. During the late 1960's and early 1970's several pro­ jects carried out extensive insulator replacement programs involving 12.47-kV, 34.5-kV, 41.8-kV, and 69-kV bus installations. All of the replaced pedestaltype insulators were supplied under one specification when the power system was first constructed. While the problem appears to be associated with moisture freeze-thaw cycling in the northern areas, we believe the problem may also exist at Reclamation facilities throughout southern portions of the United States."
+      },
+      {
+        "id": "S3",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-26 FAILURES OF PEDESTAL-TYPE (PIN AND CAP) INSULATORS",
+        "pages": "27-29",
+        "text": "While the problem appears to be associated with moisture freeze-thaw cycling in the northern areas, we believe the problem may also exist at Reclamation facilities throughout southern portions of the United States. We therefore recommend that each project review its record of insulator failures and carefully examine pedestal insulators, particularly those mounted horizontally and used for hook-stick-operated switch supports. If the problem of defective insulators exists, a program should be developed for replacement with post-type insulators. 1 (FIST 3-26 6/91) Spare Parts for Westinghouse Outdoor Switches The Switchgear Division of the Westinghouse Electric Corporation withdrew from the outdoor disconnect switch business in August, 1974 and ceased production of all switch renewal parts. In 1975, Westinghouse made arrangements with an independent firm to supply renewal parts for the following switches: Types V, V2, V3, V5, RL, RL-1, RL-2, HDB, CB, and LCO Any inquiries regarding renewal parts for the above Westinghouse switches should be directed to: Cleveland/Price Enterprises North Huntingdon, Pennsylvania 15642 Telephone (412) 864-4177 Your inquiry should contain the following information to assure a prompt response:"
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "6. Mechanical damage 7. Wrong polarity on dc unit",
+        "pages": "137",
+        "text": "Table 11-2. Troubleshooting chart for general control equipment (continued) Trouble Cause Too slow blowing 1. Wrong size of fuse for application TRANSFORMERS: Overheating 1. Overcurrent or overvoltage 2. Intermittent-rated unti left on continuously. Insulation failure 1. See insulation failure MASTER, SELECTOR, LIMIT, These causes are similar to those listed under SPEED, FLOAT, FLOW, PRESSURE, contacts, mechanical parts, and insulation KNIFE, AND DRUM SWITCHES; PUSH BUTTONS. MANUAL CONTACORS, RHEOSTATS: MANUAL STARTERS: BREAKERS: Premature tripping Failure to latch in or open and reset Short contact life These causes are similar to those listed under contacts, sliding contacts, mechanical parts, insulation failure, and thermal overload relays. and auxiliary pilot devices affected by operating circuit 4. Incorrectrating Incorrect adjustment 2. 3. 4. 5. 6. 7. 8. 1. 2. Worn parts Excessive currents causing contact wear Fault in remote control circuit Door mechanism out of adjustment Trip element or mechanism damaged Corrosion or dirt Arc chutes damaged Corrosion High currents and frequent operatio n causing burning Welding of contacts 1. High inrush currents during motor starting contacts Course of action Keep ferrules and clips clean."
+      },
+      {
+        "id": "S5",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "7. Transformer bank connected in configuration",
+        "pages": "22",
+        "text": "Motor insulation tests (documented in AlEE Spec­ ification 510 and IEEE 117) show that 10 per cent increase in insulation temperature over design tem­ perature cuts motor insulation life in half. And, as pointed out in NEMA Standard MG 1-14.33, voltage unbalance of only 3.5 per cent will cause an increase in temperature rise of about 25 per cent. Examination of the winding of a motor that has failed because of voltage unbalance will reveal a failure pattern typical of single-phasing--a condition diagnosed as the cause of many motor winding failures. If investigation reveals that single-phasing did not occur, the failure is often attributed to a faulty motor. One electric utility reports that among its customers there were 300 confirmed cases of motor burnouts caused by single phasing or voltage unbalance within a one-year period. Because large industrial plants seldom report motor failures to the utility company, it follows that the reports of failure came from operators of commercial buildings and small plants which do not have their own electric department."
+      }
+    ]
+  }
+]

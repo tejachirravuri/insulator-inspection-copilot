@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What does the device that controls how much water reaches the turbine do?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"governor controls wicket gates water flow to turbine function\"\n}",
+    "result_summary": "5 passages: S1 p.46, S2 p.46-47, S3 p.149, S4 p.8, S5 p.42-43",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "That device is the **governor**. It controls the generator's power and frequency output by regulating how much water flows to the turbine [S1].\n\n**Types:**\n- **Mechanical** governors [S1].\n- **Electrohydraulic** governors, which use electronic controls [S1].\n- **Digital** governors, a newer kind that replace the analog electronics of older electrohydraulic units with digital control circuits [S1][S2].\n\n**Maintenance:**\n- Preventive maintenance follows the manufacturer's recommendations [S2].\n- The control system alignment is checked every 5 years [S2].\n- Mechanical maintenance is covered in FIST Volume 2-3 (mechanical governors) and FIST Volume 4-1A (mechanical equipment scheduling) [S1][S2].\n\nThe passages I found don't explain how the governor moves the water-control parts, such as the wicket gates, or how its control loop works. For that, you'd need FIST Volume 2-3 or the manufacturer's manual, and neither is in this knowledge base. These are also older US Bureau of Reclamation documents (2005), not current EU/German standards."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "21.3 Maintenance Schedule for Generators and Large Motors",
+        "pages": "46",
+        "text": "Stator winding - power factor measurements (Doble) Nonroutine. May be performed in conjunction with other generator condition tests. Stator core - physical inspection During 1-, 2½-, and 5-year warranty inspections; thereafter, during major maintenance outages but not to exceed 5 years. Stator core - core magnetizing test Nonroutine. Should be performed prior to rewind or if core has been damaged. Rotor - physical inspection During major maintenance outages but not to exceed 5 years. Rotor - insulation resistance polarization (Megger®) Nonroutine. Performed when deterioration is suspected. Rotor - AC pole drop test Nonroutine. Performed when deterioration is suspected. Thrust and upper guide bearing insulation test Annually per FIST Volume 5-11. Governors control generator power and frequency output by regulating water flow to the turbine. Governors may be mechanical type or electrohydraulic type having electronic controls. New digital governors substitute digital control circuits for analog electronic controls of older electrohydraulic governors. Mechanical governor maintenance is fully described in FIST Volume 2-3, Mechanical Governors for Hydraulic Units."
+      },
+      {
+        "id": "S2",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "22. Governors 22.1 General",
+        "pages": "46-47",
+        "text": "New digital governors substitute digital control circuits for analog electronic controls of older electrohydraulic governors. Mechanical governor maintenance is fully described in FIST Volume 2-3, Mechanical Governors for Hydraulic Units. Mechanical maintenance requirements for all types of governors are identified in FIST Volume 4-1A, Maintenance Scheduling for Mechanical Equipment. The electrical maintenance schedule below supplements these mechanical maintenance requirements. Preventive maintenance Per manufacturer’s recommendations Manufacturer’s instruction manuals Control system alignment 5 years Reclamation Recommended Practice Equipment grounding is an essential part of protecting staff and equipment from high potential caused by electrical faults. Equipment grounding conductors are subject to failure due to corrosion, loose connections, and mechanical damage. Grounding may also be compromised during equipment addition and removal or other construction-type activities. Periodically verifying grounding system integrity is an important maintenance activity. Substations/Switchyards Visual inspection, tighten connectors Annually PEB No. 26 24. Motors (< 500 hp) Motors of this type drive pumps, valves, gates, and fans. They are usually induction motors and are generally less than 500 hp but may be somewhat larger. Critical motors should routinely be tested."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "14-3. Battery safety.",
+        "pages": "149",
+        "text": "Squeeze bottles are date coded and should be replaced before the expiration date. Exercise canister units periodically to prevent clogging of the head. Ensure that a good flow of water is available when it’s really needed. c. Explosive gas hazard. The NEC requires removal of possible explosive gas buildup, since all battery types can outgas. Check that gas accumulation is limited to less than 2 percent of the total volume of the battery room or enclosure. For flooded lead-acid batteries, the maximum hydrogen evolution rate is 0.000269 cubic feet (7618 cubic millimeters) per minute per charging ampere per cell at 77 degrees F (25 degree s C), one atmosphere. The maximum rate occurs when a fully charged battery has maximum current forced into it. d. Electrical hazard. Most batteries are operated ungrounded, so touching a live part will not result in a shock. The real hazard exists when an accidental ground is already present and a person touches a live part. In this case, the person completes the circuit to ground and current will flow through the person."
+      },
+      {
+        "id": "S4",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "13. If a factory erecting engineer was employed during",
+        "pages": "8",
+        "text": "Timing tests must be made after installation of a circuit breaker in any event. check the ratio where practicable. The polarity of 14. Check all high voltage switches for proper opground relay polarizing current transformers in the eration and adjustment tertiary windings of autotransformers should be checked using the method presented in the copy of an 15. Make complete functional tests of all controls and article at the end of this section from the February 8, equipment. Tests should be made to determine that 1965, issue of Electrical World magazine. each element of each relay and other protective devices trip the proper circuit breakers; all manual metering equipment and all kilowatt-hour telemetering facilities. controls, including supervisory, function properly; all reclosing, transfer trip, and blocking schemes operate properly, etc. 6. Test and set all protective relays, and test all 16. After energizing, test and adjust capacitor potential switchboard instruments. devices. 7. Check and calibrate all analog and digital tele- 17. Check phasing and phase rotation and check metering. synchronizing circuits. 8. Test and adjust all supervisory control and as- 18."
+      },
+      {
+        "id": "S5",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "18.2 Maintenance Schedule for Exciters and Voltage",
+        "pages": "42-43",
+        "text": "It is recommended that qualified staff in the Hydroelectric Research and Technical Services Group (D-8450) perform these tests. Preventive maintenance Per manufacturer’s recommendations Manufacturer’s instruction manuals Automatic voltage regulator (AVR) and power system stabilizer (PSS) performance testing Contact the Controls Team of the Hydroelectric Research and Technical Services Group, D-8450, 303-445-2309 5 years Western Electricity Coordinating Council Controls Working Group (WG) Recommendations Policy Infrared scan Annually Reclamation Recommended Practice 19. Fire Detection, Fire Fighting Equipment, and Alarm Systems Fire detection and alarm systems provide indication and warning of fire in the facility. They are crucial to safety of personnel and the public. Correct operation may also minimize damage to equipment by an early response. Regular maintenance of systems in unstaffed facilities is particularly important because O&M staff are not usually present to detect problems."
+      }
+    ]
+  }
+]

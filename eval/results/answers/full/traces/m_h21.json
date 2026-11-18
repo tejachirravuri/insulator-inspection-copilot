@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What should a worker assume about electrical gear until it is proven safe?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"assume equipment energized until proven de-energized safe\"\n}",
+    "result_summary": "5 passages: S1 p.15, S2 p.19, S3 p.19, S4 p.104, S5 p.97",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"consider all lines and equipment energized unless tested and grounded\"\n}",
+    "result_summary": "5 passages: S6 p.64-65, S7 p.15, S8 p.15, S9 p.165, S10 p.15",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "Assume it is **live**. TM 5-684 says to treat all electrical equipment as energized until you know for certain that it isn't, for example because grounding clamps are in place. It lists this as one of two required safety rules [S8].\n\n**What the manual says this means in practice:**\n- **Before work:** De-energize the equipment and lock it out or tag it out so it can't be switched back on by surprise. Then test to confirm it's dead, and ground it before starting [S5].\n- **Transformers:** Even for an external look only, treat the case as live until you've checked that the tank ground connection is adequate [S5].\n- **Switches:** Don't work on a switch until both sides of each phase are de-energized and properly grounded. Check that a circuit is dead before closing a grounding switch [S4].\n- **Ground connections:** Never remove them while a substation is energized. A dangerous voltage can build up across the gap, especially during a fault [S3].\n- **Protective grounds:** Temporary grounds at the work site keep the voltage between any two points you can touch at a safe level [S1].\n- **Live work:** Only people qualified for that voltage level may work on energized lines and equipment [S8].\n\nThese rules come from a 1996 US Army manual. The manual itself also points to the NEC and NESC codes, OSHA 29 CFR 1910/1926 and the service safety manuals [S8][S9]. In the EU or Germany, follow current local rules instead, such as DIN VDE 0105-100 / EN 50110 and its \"five safety rules\"."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "1-12. Personnel safety.",
+        "pages": "15",
+        "text": "(2) Work may be done on energized lines and equipment only by personnel qualified by their job descriptions for that voltage level. Job descriptions should require actual hands-on work service periods which meet local utility and the International Brotherhood of Electrical Workers approval. All tools and equipment must be maintained in proper operating order, be suitable for the maximum voltage level involved, and should be periodically tested for compliance with all safety requirements. Departmental publications should be consulted for specific requirements in each voltage level. b. Service safety manuals. This manual addresses some safety requirements, but users should also be familiar with the service safety manuals TM 5-682, NAVFAC P-1060, and AFMAN 32-1078. c. Personal protective temporary grounding . This is temporary grounding installed to protect workers engaged in de-energized line maintenance. The grounds are provided to limit the voltage difference between any two accessible points at the work site to a safe value. An expanded discussion of protective grounding principles and practices is contained in IEEE 1048, NFPA 70B and “The Lineman’s and Cableman’s Handbook”."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-2. Electrical system relationship.",
+        "pages": "19",
+        "text": "Most substations are designed so they do not require attendant personnel on a continuous basis. Supervisory control and data acquisition (SCADA) systems, where provided, allow monitoring at a central point. Substations present a potential safety hazard, owing to the large amount of energized conductor surface concentrated in a relatively small area. In general, only portions of an entire substation can be de-energized, although scheduled outages may be required for equipment which can not be bypassed or worked on while energized. All inspecting and repairing personnel must be thoroughly trained. The following requirements are minimum: a. Familiarity with operating procedures, protective and interlocking schemes, and the equipment capabilities at the specific substation. b. Knowledge of the proper use of safety equipment, first aid procedures and equipment, and equipment grounding techniques. c. Access to safeguards such as danger signs, temporary barriers, protective clothing, tools and protective equipment, and all safety manuals and rules. Procedures should clearly indicate insulating requirements and working clearances for any category of energized-line maintenance employed. d."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-6. Visual inspections of substations.",
+        "pages": "19",
+        "text": "Visual inspections should include the total substation area including the site, the control house, and all equipment and structures. The energized substation should be inspected from ground level, to ensure adequate safety clearances from energized parts. Binoculars should be used to view buses and other equipment located on structures. Special care should be used when ground connections are checked, since a high voltage could develop across any gap created between a ground cable and a piece of equipment, particularly under fault conditions. For this reason, ground connections shall not be removed for any reason while the substation is energized. All matter emits infrared rays in proportion to its temperature. a. Method. An infrared detecting device can be used to determine loose connections, overloading of conductors, localized overheating in equipment, or similar conditions before they become serious. Some equipment is sensitive to a fraction of a degree. Infrared inspection can be done from a distance, since contact with the item being measured is not required. Substation equipment, such as bare bus, disconnect switches, and connections, can be checked without being de-energized."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-10. Operation of Switches.",
+        "pages": "104",
+        "text": "Freeing of an iced switch mechanism may be assisted by a few sharp raps on the vertical operating pipe or suddenly applied tugs on the operating handle. (3) Operate power-operated switches periodically to ensure that their mechanisms and control features are functioning properly. If the circuit cannot be de-energized to operate a switch, the operating mechanism should be disengaged from the linkage. Check control circuits and mechanisms in the disengaged manner, unless disengagement will change the overall adjustment. b. Disconnecting switches: (1) Check that no load is being carried by the switch, prior to operating a disconnecting o r horngap switch. (2) Check to determine that operation does not remove necessary safety grounds, prior to opening a grounding switch. Check the circuit to confirm that it is not energized, prior to closing. (3) Operate disconnecting switches rapidly to reduce arcing time and possible burning of contacts. No workshould be done on switches until both sides of eac hphase are de-energized and properly grounded. In addition to the recommendations given herein, follow the specific maintenance directions of the switch manufacturer."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "7-5. Transformer inspections.",
+        "pages": "97",
+        "text": "If a transformer is given an external visual examination, the case of the transformer should be regarded as energized until the tank ground connection is inspected and found to be adequate. If any procedure more extensive than an external visual examination is to be performed, de-energize the transformer, using an approved positive lockout or tagout procedure to ensure against an unplanned reenergization and resulting hazard to personnel or equipment. Before doing anything else, test t o ensure that the equipment is de-energized, and ground the equipment prior to the start of any work. (10) External inspection. Provide an external inspection on a semi-annual basis. Check the tank, radiators, the tap changer, and all gasketed or other openings for leaks, deposits of dirt, or corrosion. Inspect connections for signs of overheating and corrosion. Inspect bushing insulating surfaces for tracking, cracks, or chipped skirts. Inspect bushing gasketed bases for leaks. Leak repair, cleaning, and painting should be done as required. See chapter 3, section VII for bushing maintenance."
+      },
+      {
+        "id": "S6",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-63. Categories of energized-line maintenance.",
+        "pages": "64-65",
+        "text": "Energized-line maintenance means work on any line electrically connected to a source of potential difference, or electrically charged so as to have a potential difference from ground. Synonyms are alive, current carrying, hot, and live. Voltage is considered medium or high if it is over 600 volts up to 230,000 volts, see section II. The categories of work apply to the potential difference from ground at which the worker operates and specific precautions apply to each potential. a. Workers at ground potential . Workers are located on the structure supporting the conductor or on other work platforms and remain essentially at ground potential using insulating tools and equipment. b. Workers at intermediate potential. Workers are isolated from grounded objects by insulating means, such as an aerial lift or an insulating ladder or platform, and work with insulating tools and equipment. c. Workers at line potential. Workers are bonded to the energized device on which work is to be performed and are insulated from grounded objects and other energized devices that are at a different potential."
+      },
+      {
+        "id": "S7",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "1-12. Personnel safety.",
+        "pages": "15",
+        "text": "(2) Work may be done on energized lines and equipment only by personnel qualified by their job descriptions for that voltage level. Job descriptions should require actual hands-on work service periods which meet local utility and the International Brotherhood of Electrical Workers approval. All tools and equipment must be maintained in proper operating order, be suitable for the maximum voltage level involved, and should be periodically tested for compliance with all safety requirements. Departmental publications should be consulted for specific requirements in each voltage level. b. Service safety manuals. This manual addresses some safety requirements, but users should also be familiar with the service safety manuals TM 5-682, NAVFAC P-1060, and AFMAN 32-1078. c. Personal protective temporary grounding . This is temporary grounding installed to protect workers engaged in de-energized line maintenance. The grounds are provided to limit the voltage difference between any two accessible points at the work site to a safe value. An expanded discussion of protective grounding principles and practices is contained in IEEE 1048, NFPA 70B and “The Lineman’s and Cableman’s Handbook”."
+      },
+      {
+        "id": "S8",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "1-10. Certification of electric workers.",
+        "pages": "15",
+        "text": "Properly trained electric workers will be certified in accordance with applicable publications. All necessary precautions will be taken to warn the public of electrical hazards or other conditions which may constitute a danger. This is especially true of temporary hazards due to work in progress. Any work on or close to electrical equipment of any kind should be considered dangerous and proper safety precautions will be taken. All personnel who perform work of any kind on or near electrical equipment must be familiar with and observe all safety precautions. a. Safety first. Two safety rules are mandatory as follows: (1) Consider all electrical equipment to be energized until it is known positively (as by the presence of grounding clamps) that it is not energized. Comply with regulations and safety instructions contained in NEC and NESC, the applicable departmental publications, and special publications issued by the local command. (2) Work may be done on energized lines and equipment only by personnel qualified by their job descriptions for that voltage level."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "15-2. Tools and equipment classification.",
+        "pages": "165",
+        "text": "Electrical inspecting and testing equipment. Electrical inspecting and testing equipmen t includes electrical and mechanical devices used to test the operation of electrical equipment, such as voltmeters, ammeters, ohmmeters, tachometers, and similar devices. e. Large portable and mobile equipment . Large portable and mobile equipment includes relatively large and easily transportable equipment for use in maintenance work, such as line trucks, aerial lift trucks, motor-generator sets, pole hole diggers, and similar apparatus. All hand and mechanically operated tools, must be used in a manner to comply with all applicable safety rules. Each worker is responsible for observing safety rules and preventing accidents. a. Energized lines. The methods used when working on energized lines, such as gloving, use of hot line tools, provision of electrically insulated buckets, will be in accordance with the applicable services’ safety manuals. Safety rules governing the use of such tools and equipment are given in these manuals and in applicable OSHA regulations, 29 CFR 1910 and 29 CFR 1926. b. Material use ."
+      },
+      {
+        "id": "S10",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "1-12. Personnel safety.",
+        "pages": "15",
+        "text": "An expanded discussion of protective grounding principles and practices is contained in IEEE 1048, NFPA 70B and “The Lineman’s and Cableman’s Handbook”. Aerial live lines are energized lines that are being tested, repaired, and maintained more and more by electrical utilities to reduce the number of outages or service interruptions. The use of such procedures on DOD installations requires that good practice be followed and that there is no conflict with local facility rules. a. Good practice. Personnel doing live-line work should have satisfactorily completed a formal training course of instruction and be examined periodically. Live-line maintenance usually means any maintenance activity performed on energized electrical conductors or equipment with a phase-tophase voltage exceeding 600 volts. It usually does not include such activities as switching, hardware tightening, climbing, hole digging, pole setting, conductor stringing, etc. The performance of this work requires equipment and tools that meet applicable industry standards for energized-line maintenance. b. Local facility rules."
+      }
+    ]
+  }
+]

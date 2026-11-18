@@ -24,3 +24,6 @@ data/uploads/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Superseded pilot run of the answer-quality evaluation
+eval/results/answers/pilot/

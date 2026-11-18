@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Why might a failed disc look perfectly fine from the outside?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"punctured insulator disc not visible externally failed suspension insulator detection\"\n}",
+    "result_summary": "5 passages: S1 p.4, S2 p.22, S3 p.23, S4 p.68, S5 p.108",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**Because the puncture is usually hidden under the cap.** When a porcelain disc is punctured, the break usually happens under the head of the insulator, so there may be no visible sign of damage from outside [S1].\n\n**How it happens:**\n- Punctures in service are rare, because the surface usually flashes over before the porcelain breaks through [S1].\n- When a puncture does happen, it usually starts as small cracks in the porcelain. These come from cement growth (the cement holding the cap expands over time) or from mechanical or thermal shock [S1].\n- Discs with large arc burns have been through electrical and thermal stress that can cause complete failure later, even if they look acceptable now. Flash-burned suspension insulators that were tested did not meet acceptable standards for good insulators [S1].\n\n**How to find them:**\n- The manual says the only reliable way to detect a puncture is an electrical test, and the Doble method has proven reliable [S1].\n- TM 5-684 says faulty insulators can also show up as visible corona or radio interference, which instruments can detect. At important sites, maintenance testing is mostly power-factor measurement [S2].\n\n**What this means for drone inspection:** The YOLOv8 detections and the AI condition reviews only work from visible features, so they can't rule out a punctured disc. A \"no visible defect\" result doesn't confirm a disc is electrically sound. Arc-burned or suspect units should be electrically tested or replaced; the manual recommends replacing damaged or suspect insulators right away [S1].\n\nThese sources are older US federal manuals (1996–2000). For current test practice, check the applicable standards, such as IEC / DIN EN."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-18 REPLACING GLAZE BURNED INSULATORS",
+        "pages": "4",
+        "text": "Replacing Glaze Burned Insulators It is recommended that damaged or suspected damaged transmission line and station insulators be immediately replaced to reduce the probability of in service failures and subsequent outages. Very few insulators are punctured in service, since a surface flashover usually occurs before puncture. When puncture does occur, it is usually the result of small cracks in porcelain started by cement growth or mechanical or thermal shock. Since a puncture usually occurs under the head of the insulator, there may be no visual evidence of the damage. The only reliable method of detecting the puncture is electrical test. The Doble test method has proven quite reliable. Large arc burns on transmission and bus insulators indicate that the insulators have been subjected to electrical and thermal stress, which could cause complete failure at a later time. A number of trans­ mission line suspension insulators, which had been damaged by flash burns, were tested by the Doble method, and it was found that they did not meet acceptable standards for good insulators."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section IV - INSULATORS 3-19. Function of insulators.",
+        "pages": "22",
+        "text": "Defective insulators can also cause visible corona or interference voltage propagation. b. Related material . Apparatus type insulators are provided in substations to support devices and heavy lines. See chapter 4, section XII, which provides a discussion of insulation levels. Radio interference conditions may be detected by using instruments designed for this purpose. Otherwise, maintenance tests on insulators are normally limited to occasional power factor measurements at the more important installations, where the loss of the facilities must be kept to an absolute minimum. Bus and switch insulators should be power-factor tested in conjunction with similar testing of other apparatus within the substation. Power factor tests are described in section VII. Switch-and-bus apparatus type insulators are the most intricate type and require the highest degree of reliability in service. This is because the several pieces of porcelain and hardware, assembled in a single unit, are usually located at key positions in the systems, where failure is extremely serious."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "(1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination. However, alternate wetting by early morning mist and fog, followed by exposure to dust and wind, can build up harmful deposits. Special contamination problems are encountered near steel mills, cement and chemical plants, and other factories that saturate the air with finely divided, semi-conductive particles. Along coastal areas, salt deposits build up and materially reduce the flashover value. Many of these deposits are extremely tenacious, requiring that the insulator be removed from service and cleaned by hand. Where contamination is serious, specia l longleakage suspension insulators for high-voltage lines have been used; but, where severe deposits occur, washing of special insulators is required as often as for standard insulators. To lengthen maintenance intervals, in areas where contamination is severe, ceramic insulators and bushings may be coated with special silicone greases."
+      },
+      {
+        "id": "S4",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix A AIR AND OIL CIRCUIT BREAKER PREVENTIVE MAINTENANCE",
+        "pages": "68",
+        "text": "Inspect wiring for open circuits, short circuits, and damaged insulation. Check insulation resistance of wiring with devices connected. Oil DGA and Dielectric Tests Annually – Check dielectric strength of the insulating oil in the main tanks and oil-filled bushings. Filter Oil • The necessity for filtering the insulating oil will depend on the results obtained from the oil tests and the amount of carbon in the oil. The oil should be filtered if the dielectric strength is below 25 kilovolts or if there is a noticeable amount of carbon in suspension or in the bottom of the tanks. Operation • Some breakers, particularly those carrying high values of current, have a tendency to develop contact heating if left closed for long periods. Opening and closing breakers several times at intervals, as system operation permits, may reduce contact resistance and heating by wiping the oxide from the contact surfaces. This method also demonstrates that the breaker is in operating condition."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-14. Maintenance of nonmetalcla d switchgear circuit breakers.",
+        "pages": "108",
+        "text": "Tripping and closing voltages should be recorded on the master record, so subsequent tests can be performed under comparable conditions. Time-travel records are taken on the middle pole from the operating mechanism. (10) Check the air system of a pneumatic mechanism for leaks. (11) Check control wiring for loose connections. (12) Check the settings of compressor switches, low pressure alarms, and cut-off switches. (13) Inspect and check the operating mechanism. Lubricate all pins, bearings, and latches, using the recommended lubricant. b. External inspection guidelines specific to the insulating medium used . Oil dielectric tests are needed for oil circuit breakers, and a moisture test should be provided for gas-insulated units. (1) Oil-insulated circuit breakers . Check oil dielectric strength, power factor, acidity, and color. The dielectric strength must be maintained to prevent internal breakdown under voltage surges and to enable the interrupter to function properly. Its action depends upon changing the internal arc path from a fair conductor to a good insulator, in the short interval while the current is passing through zero."
+      }
+    ]
+  }
+]

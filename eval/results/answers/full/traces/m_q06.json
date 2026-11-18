@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Are a few bullet holes in the sheds of a polymer insulator a serious problem?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"bullet holes gunshot damage insulator sheds\"\n}",
+    "result_summary": "5 passages: S1 p.23, S2 p.80, S3 p.53, S4 p.4, S5 p.49",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"polymer nonceramic insulator damage inspection replacement criteria\"\n}",
+    "result_summary": "5 passages: S6 p.23, S7 p.22-23, S8 p.53, S9 p.23, S10 p.103",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**Usually not, if the holes go only through the sheds.** According to TM 5-684, a few holes through only the weathersheds will have little or no effect on how the insulator performs [S1].\n\n**What makes it serious:**\n- **Damage to the shank or core.** If the damage reaches the shank, replace the insulator as soon as practical, especially if there is metal stuck in it [S1]. The core is the resin-and-glass-fibre part that carries the load. The sheds protect it [S7].\n- **Damage you can't see.** Bullet damage to polymer insulators isn't always easy to spot by eye [S1]. A clean-looking hole in a shed doesn't prove the shank was missed.\n\n**What to do in practice:**\n- Look closely at the shank or core near each hole. Check for embedded metal, exposed glass fibre or a broken housing.\n- Also check the metal end fittings for cracks or rust [S1].\n- If you can't rule out shank damage from drone images, have someone check it up close. When in doubt, replacing it is reasonable.\n\n**Caveat:** This guidance comes from a 1996 US Army manual. It is not a current EU or German standard (for example DIN EN / IEC), and the manuals I have don't say how much shed damage is too much. Check the manufacturer's guidance and your utility's own rules before deciding to leave a damaged insulator in service."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "Insulators have excellent mechanical and dielectric strength, ar e nontracking, and do not carbonize under severe arcing conditions. They are very durable for use in an adverse atmosphere. Polysil was developed by the Electric Power Research Institute (EPRI). (2) Inspection and replacement . Composite insulators are frequently used in outlying areas where shooting vandalism is a problem. Damage to nonceramic insulators, particularly from small arms ammunition, may not always be easily detected visually. When such damage is detected, the damaged insulators should be replaced as soon as practical, especially if embedded metal is found in the shank of the insulator. A few holes through only the weathersheds will have little or no adverse effect on the performance of the insulator. c. Metal parts. Metal parts consist of fittings that connect the insulator at one end to the support and at the other end to the conductor. (1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "5-24. Other cable insulation and covering repairs.",
+        "pages": "80",
+        "text": "If a cable were to fail and burn a hole through the insulation and then be re-energized, a very small amount of gas in the hole could arc and may be noticeable. The smell and toxic gas will dissipate fast. Follow instructions for SF, gas handling in chapter 15, section II. (4) Cable insulation . If the cable insulation fails, the repair should be made as given for solid dielectric insulated cables. f. Armor. There are various types of armor to provide mechanical protection for the cable insulation and some armor is provided with a protective jacket. (1) Flat metal armor. When flat metal armor is broken, it can be repaired in place by soldering the broken part or by overlapping a short piece of armor and soldering. The armor should be thoroughly cleaned and tinned before soldering. If the armor becomes loose at the ends of the cable, it may be wired to the lead sheath or a lead sleeve installed at each end. (2) Inter-Locked armor sheath . The interlocked armor sheath may sometimes be separated during installation."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-45. Insulator operating performance.",
+        "pages": "53",
+        "text": "Operating performance of aerial lines is dependent upon the quality of the line insulators. Pole-line inspection should reveal damage, even if visible corona or recognizable interference voltages have not already indicated some impairment. a. Damaging conditions. Most pole-line insulator damage results from gun shots, lightning or contamination flashovers, and wind damage. b. Understanding insulator provisions. Insulators provide mechanical and electrical performance values to meet requirements imposed by different applications. Mechanical performance dictates to a certain extent the type of insulator most suitable for the line being supported. Electrical performance requirements are mainly based on operating voltage and the degree to which area conditions affect the electrical performance. Insulators used are the pin, post, and suspension type for primary lines; the spool, pin, and knob type for secondary lines ;and the guy strain type for guys, as covered in section XIII. Figure 4-17 shows the different types normally used on facilities covered by this manual. a. Pin insulators . This insulator gets its name from the fact it is supported on a pin."
+      },
+      {
+        "id": "S4",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-18 REPLACING GLAZE BURNED INSULATORS",
+        "pages": "4",
+        "text": "Replacing Glaze Burned Insulators It is recommended that damaged or suspected damaged transmission line and station insulators be immediately replaced to reduce the probability of in service failures and subsequent outages. Very few insulators are punctured in service, since a surface flashover usually occurs before puncture. When puncture does occur, it is usually the result of small cracks in porcelain started by cement growth or mechanical or thermal shock. Since a puncture usually occurs under the head of the insulator, there may be no visual evidence of the damage. The only reliable method of detecting the puncture is electrical test. The Doble test method has proven quite reliable. Large arc burns on transmission and bus insulators indicate that the insulators have been subjected to electrical and thermal stress, which could cause complete failure at a later time. A number of trans­ mission line suspension insulators, which had been damaged by flash burns, were tested by the Doble method, and it was found that they did not meet acceptable standards for good insulators."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-39. Overhead cable repair requirements.",
+        "pages": "49",
+        "text": "Check to see that cable insulation is not abraded, pinched, or bent too sharply. a. Insulation. Insulation repair is covered in chapter 5, section VI. b. Sheath. A sheath is sometimes applied to the insulated conductors to provide extra protection from moisture, mechanical damage, or atmospheric contaminants. The sheath may be metallic armor, lead, or another protective covering. Wear at points of support and cracks from vibration are the principal causes of sheath failure, although burns and mechanical damage are often contributing factors. Sheath repairs should be made as soon as the damage is discovered. If failure has not yet occurred, temporary repairs or protection may be desirable. Such temporary expedients may include providing weather shielding, taping, or spreading single conductors. Permanent repairs should be as extensive as necessary, from patching to replacement of the damaged length. c. Messenger. The supporting messenger is usually of stranded galvanized steel or copper-clad steel. The initial design will provide adequate strength to support the cable under the maximum loading of ice and wind, and the temporary loads involved in installation and maintenance."
+      },
+      {
+        "id": "S6",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "Insulators have excellent mechanical and dielectric strength, ar e nontracking, and do not carbonize under severe arcing conditions. They are very durable for use in an adverse atmosphere. Polysil was developed by the Electric Power Research Institute (EPRI). (2) Inspection and replacement . Composite insulators are frequently used in outlying areas where shooting vandalism is a problem. Damage to nonceramic insulators, particularly from small arms ammunition, may not always be easily detected visually. When such damage is detected, the damaged insulators should be replaced as soon as practical, especially if embedded metal is found in the shank of the insulator. A few holes through only the weathersheds will have little or no adverse effect on the performance of the insulator. c. Metal parts. Metal parts consist of fittings that connect the insulator at one end to the support and at the other end to the conductor. (1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination."
+      },
+      {
+        "id": "S7",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22-23",
+        "text": "To avoid damaging good insulators, tap them; do not hit them hard. (3) Repair. (a) If the main body of a pin type or post insulator is cracked, replace it immediately. (b) Hone small chips from shells or skirts, and paint with an insulating paint or varnish to provide a glossy finish and to lessen dirt accumulation. (c) Since the loss of a skirt on a pin-type insulator reduces the insulation value of the insulator by 30 percent or more, replace such broken units. b. Nonceramic insulators. Nonceramic or composite insulators include core, weathersheds, and metal-end fittings. A weathershed is the external part of the insulator that protects the core or mechanical load-bearing component and provides the wet electrical strength and leakage distance. The core consists of resin and glass fibers. The weathersheds are of polymeric materials such as epoxy resins or elastomers and normally contain inorganic fillers. Since the insulating qualities of insulators, and their ability to prevent flashovers, depend on preventing contamination buildup, cleaning frequencies will depend on the location."
+      },
+      {
+        "id": "S8",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-42. Overhead line connections.",
+        "pages": "53",
+        "text": "Armor rods are sometimes used as a repair fo r bro4-43. Overhead line armo r rods. Armor rods are required for all aluminum and ken or damaged strands. If damaged armor rods are found, replacement is recommended. Armor rods should be installed in accordance with manufacturACSR cable supports except at dead ends. The rods provide threefold protection by preventing the er’s instructions. Insulator use, inspection, repair, and cleaning are discussed in chapter 3, section IV, which also applies to pole-line insulators. Apparatus insulators used on substation equipment and to support buses are much heavier and more expensive tha n poleline insulators. It may be more economical to replace pole-line insulators than to repair them. In many instances it is possible to wash energized pole-line insulators, as covered in section XV Operating performance of aerial lines is dependent upon the quality of the line insulators. Pole-line inspection should reveal damage, even if visible corona or recognizable interference voltages have not already indicated some impairment. a. Damaging conditions."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "Since the insulating qualities of insulators, and their ability to prevent flashovers, depend on preventing contamination buildup, cleaning frequencies will depend on the location. Ceramic insulators must maintain their glass-like glaze and care must be taken in cleaning to prevent this smooth surface from being scratched or dulled. Nonceramic insulators will deteriorate with time as the surface decomposes, although proper cleaning will help to extend their service life. For convenience, safety and thoroughness, insulators should be cleaned while out of service. (1) Construction. (a) Fiberglass . Fiberglass insulators are manufactured with rods of fiberglass treated with epoxy resins. Rubber-like compounds are applied to the rods to fabricate suspension, dead-end, and post-type insulators. (b) Polysil. Polysil insulators are formed by using various sizes of silica bound together chemically with a resin into a compound which is approximately 90 percent silica. Insulators have excellent mechanical and dielectric strength, ar e nontracking, and do not carbonize under severe arcing conditions. They are very durable for use in an adverse atmosphere. Polysil was developed by the Electric Power Research Institute (EPRI)."
+      },
+      {
+        "id": "S10",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-8. Fuse maintenance.",
+        "pages": "103",
+        "text": "Replace those units that indicate deteriorated condition. (2) Inspect fuse holder insulators for dirt, dust, salt deposit, and the like, which can cause flashover. Also look for cracks or burn marks on insulators. (3) For vented expulsion-type fuses, inspect the seal on the expulsion chamber to ensure that no moisture has entered the interrupting chamber of the fuse. (4) Check f or any missing or damaged hardware, such as nuts, bolts, washers, and pins. (5) Clean and polish contact surfaces of clips and ferrules that are corroded or oxidized. (6) Tighten all 1oose connections and check to see if the fuse clips exert sufficient pressure to maintain good contact. (7) Fuses that show signs of deterioration, such as loose connections, discoloration, or damaged casing should normally be replaced. b. Periodic inspection of fuse links in distribution cutouts."
+      }
+    ]
+  }
+]

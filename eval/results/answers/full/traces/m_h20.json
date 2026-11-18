@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "In a lighting circuit where the lights are wired one after another, what is the same for every light?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"series circuit current same through each lamp\"\n}",
+    "result_summary": "5 passages: S1 p.86, S2 p.86, S3 p.91, S4 p.91-93, S5 p.86",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**The current is the same for every light.** In a series lighting circuit, the same current flows through all the lamps, while the voltage varies [S1].\n\nSome more detail from TM 5-684 (US Army, 1996):\n- A constant-current transformer (regulator) powers the circuit. Common ratings are 6.6, 15 or 20 A. 6.6 A is the most common, and airfield circuits use only 6.6 or 20 A [S1].\n- Series circuits are mainly used for airfield lighting because they give every light the same brightness. Some older street and security lighting also uses them [S5].\n- **Safety:** These circuits run at about 2,400 to 7,200 V to keep the current constant, so always treat them as medium-voltage circuits [S1][S2].\n- If a lamp fails, a film cutout bypasses it so the rest of the circuit stays lit. Put in a new cutout with the right rating whenever you replace a faulty lamp [S3].\n\nBy comparison, the more common \"multiple\" (parallel) circuits work the other way round: every light gets the same voltage [S5]."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "6-2. Types of lighting circuits.",
+        "pages": "86",
+        "text": "Circuits exceeding 277 volts to ground, but not exceeding 600 volts, need to meet NEC pole and structure mounting height requirements. b. Series circuits. In a series circuit, all of the lamps are connected in series. The same current, therefore, flows through all the lamps and the voltage varies .The power is supplied through a constant-current transformer (regulator). These transformers are available to supply circuits rated 6.6, 15, or 20 amperes. The most common value of current used is 6.6 amperes and only 6.6 and 20 amperes are used for airfield lighting circuits. The lamps may be connected either directly to the series circuit or to insulating transformers connected to the series circuit. Most series airfield lighting circuits use insulating transformers. Series circuits may be installed as an open-loop, a closed-loop, or a combination of both. In the closed loop and combination systems the conductors are close together in numerous places so the circuit can be conveniently short-circuited when troubleshooting. Series circuit voltages range from 2,400 to 7,200 volts, in order to maintain the constant current."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "6-2. Types of lighting circuits.",
+        "pages": "86",
+        "text": "In the closed loop and combination systems the conductors are close together in numerous places so the circuit can be conveniently short-circuited when troubleshooting. Series circuit voltages range from 2,400 to 7,200 volts, in order to maintain the constant current. Therefore, series circuits must always be treated as medium-voltage circuits. nents. the ballast. A multiple type lighting system consists o f luminaires, mounting structures for luminaires, the control system to switch luminaires on and off, and the input circuit which provides the low voltage to operate the luminaires. Generally, some type of power transformer will provide input low voltage. Transformer requirements are provided in chapter 7. 6-5. lamp types. There are two types of lights used in outdoo r luminaires. These are filament types and gaseous conductive types. Filament lamps use the filament for conducting current. Gaseous conductive types use an ionized gas or vapor for the electron flow and are of the electric-discharge lamp type or fluorescent lamp type. -- The basic, most visible part of an exterior lighting system, is the combination of luminaire and lamp or lamp/ballast."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "6-14. Series type lighting controls and protection.",
+        "pages": "91",
+        "text": "Series plug cutouts. Cutouts are plug-type units used to disconnect a series light circuit or its constant current regulator. With the plug handle assembly removed and secured, maintenance personnel are ensured of protection. d. Film cutouts. Film cutouts or film disks operate automatically and are inserted in older lamp sockets to bypass failed lamps. Some circuits that have more than one lamp on an insulating transformer will use film cutouts to bypass a burned-out lamp and keep the other lamps supplied from that transformer operating. Because of their size and shape, they are sometimes referred to as “dimes.” When current no longer flows because of lamp failure or removal, full circuit voltage exists across the cutout film, which then ruptures, allowing the series circuit to be completed. A new film cutout of proper rating must be used whenever a faulty lamp is replaced. It is good practice to replace the cutouts whenever lamps are replaced under a group replacement program. Always screw the lamp into the socket before inserting the socket into the receptacle."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "6-15. Series type lighting power supply",
+        "pages": "91-93",
+        "text": "However, a short circuit, even a bolted short, on a secondary will have no immediate adverse effects if a reasonable percentage of the load remains energized. b. Insulating transformers . Insulating transformers isolate the medium-voltage of a series circuit from the wiring and fixtures. In addition, they are sometimes used to obtain higher or lower current for lamps having a different ampere rating, or constant voltage for multiple lamps connected to a series circuit. They are sometimes referred to as isolating transformers. Unless the case and one secondary conductor are grounded, the secondary must be treated as a medium-voltage circuit: .- Use the recommended guidelines for th e maintenance of airport visual aid facilities given in FAA AC 150/5340-26 which covers the various types of lighting systems, the airfield lighting vaul t equipment, and associated control tower equipment. It also includes troubleshooting procedures for series lighting circuits. This chapter provides maintenance and repair requirements for transformers used in the transmission and distribution of electrical energy and for voltage regulators."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "CHAPTER 6 OUTDOOR LIGHTING Section I--LIGHTING AND CIRCUIT TYPES 6-1. Outdoor lighting use.",
+        "pages": "86",
+        "text": "Outside building-mounted lighting is considered interior lighting, if its sole purpose is to facilitate entrance into that building. ‘V Most lighting circuits will be of the multiple circuit type. Generally series circuits are used for only airfield lighting systems (except for very small airfields) to provide uniform brightness to all lights in a circuit. Some older streetlighting and protective lighting circuits may also be supplied from series circuits. a. Multiple circuits. Multiple circuits use constant-voltage single-phase inputs, usually of 120, 208, 240, 277, and 480 volts. The lights are connected in parallel. There are no code restrictions on the location of 120-volt lamps. When installed on buildings, circuits exceeding 120 volts, but no t exceeding 277 volts to ground, need to meet NEC requirements for their distance from windows, platforms, and fire escapes. Circuits exceeding 277 volts to ground, but not exceeding 600 volts, need to meet NEC pole and structure mounting height requirements. b. Series circuits. In a series circuit, all of the lamps are connected in series."
+      }
+    ]
+  }
+]

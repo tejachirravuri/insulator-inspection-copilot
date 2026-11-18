@@ -1,0 +1,25 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What is the highest YOLO confidence among the detections in inspection 3?"
+  },
+  {
+    "role": "tool_call",
+    "name": "get_inspection",
+    "content": "{\n  \"image_id\": 3\n}",
+    "result_summary": "image 3: 7 detections",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "The highest YOLO confidence in inspection 3 (B_0090.jpg, glass insulators) is **0.727**. It belongs to **detection #7**, a `glass_insulator` at box [23.0, 320.8, 79.8, 349.5].\n\n- **Model:** These scores come from the accurate YOLOv8s model (`glass_y8s_accurate`). The run was set to auto mode and switched up to the accurate model.\n- **Other detections:** The image has 7 detections, with confidences from 0.2745 to 0.727. The next highest is detection #8 at 0.5803.\n- **Condition review for #7:** The AI review marked it \"unclear\" and flagged it for human review because the crop is very small and blurry. A high detection confidence doesn't tell you anything about the insulator's condition, so a qualified person still needs to check it."
+  },
+  {
+    "role": "sources",
+    "content": []
+  }
+]

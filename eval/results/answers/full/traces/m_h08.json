@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Why do the large oil-filled step-up transformers at hydro plants need extinguishing systems?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"transformer fire protection deluge water spray oil-filled transformers\"\n}",
+    "result_summary": "5 passages: S1 p.58, S2 p.55-56, S3 p.54-55, S4 p.99, S5 p.30-31",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"why large oil-filled transformers need fire extinguishing system hazard\"\n}",
+    "result_summary": "5 passages: S6 p.58, S7 p.55-56, S8 p.149, S9 p.56-57, S10 p.30-31",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**These step-up transformers hold thousands of gallons of flammable oil.** The Bureau of Reclamation therefore requires fire suppression on all mineral oil-filled generator step-up (GSU) transformers [S1].\n\n**What the manual bases this on** [S1]:\n- Reclamation's own past practice\n- NFPA 851, \"Fire Protection for Hydroelectric Generating Plants\"\n- Edison Electric Institute, \"Fire Protection for Transformers\"\n\n**Where these transformers sit:** They carry power to and from the plant's main units. They're usually outside the building, in a transformer bay or a switchyard [S9].\n\n**Related risk:** The manuals warn that some smaller oil-filled equipment can fail violently if it isn't maintained or tested on schedule. This applies to instrument transformers and to coupling capacitor/voltage transformers [S2], [S5]. The manuals don't say this about GSU transformers specifically.\n\n**Maintenance:** Run the suppression system's pump with water flowing once a year (NFPA 25, 8.3.3; FIST Volume 3-32). Maintain the fire pumps according to the manufacturer's instructions [S1].\n\n**What the passages don't cover:** They don't explain how a transformer fire starts or spreads, or which type of suppression system to use. For that, check NFPA 851 or FIST Volume 3-32.\n\nThese are older US federal documents (FIST 4-1B, 2005). For a plant in Germany or the EU, current European and German standards and local fire-safety rules apply instead."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "32. Transformer Fire Suppression Systems 32.1 General",
+        "pages": "58",
+        "text": "Reclamation generator step-up (GSU) transformers normally contain thousands of gallons of flammable transformer oil. Based on Reclamation’s past practice, on NFPA 851 “Fire Protection for Hydroelectric Generating Plants,” and Edison Electric Institute’s “Fire Protection for Transformers,” Reclamation requires fire suppression for mineral oil-filled GSU transformers. Suppression Systems Annually run pump with water flow NFPA 25, 8.3.3 FIST Volume 3-32 Fire pumps Maintenance See manufacturer’s instruction"
+      },
+      {
+        "id": "S2",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "31.4 Instrument Transformers 31.4.1 General",
+        "pages": "55-56",
+        "text": "Instrument transformer secondary wiring always should be checked for integrity after any work that may have disrupted these circuits. Instrument transformers that are oil-filled will fail catastrophically and cause hazards to workers if not maintained properly. Any oil leak should trigger immediate Doble testing and replacement planning. 4 kVA = kilovoltampere. Review equipment ratings 5 years NERC Planning Standard Burden measurements 5 years FIST Volume 3-8 Doble test if oil-filled 5 years Reclamation Recommended Practice Visual inspection Annually Reclamation Recommended Practice Infrared scan Annually NFPA 70B, 20.17 31.5 Dry-Type Power Transformers – 500 kVA and Larger Dry-type power transformers are air cooled, having no liquid insulation. Typical applications include station service and excitation system transformers."
+      },
+      {
+        "id": "S3",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "31. Transformers 31.1 General",
+        "pages": "54-55",
+        "text": "Transformers convert electrical power from one voltage level to another. Transformer reliability is essential to the continued delivery of the facility’s services. Maintenance references and standards from which the recommendations are drawn are numerous: • Manufacturers’ instruction books • Doble Transformer Maintenance and Test Guide • IEEE Std. 62-1995 • FIST Volume 3-30, Transformer Maintenance • FIST Volume 3-31, Transformer Diagnostics • NFPA 70B - Recommended Practices for Electrical Equipment Maintenance • Transformers: Basics, Maintenance, and Diagnostics (Reclamation manual) 31.3 Station/Distribution Transformers Under 500 kVA4 Station and distribution transformers generally operate at relatively low voltages and power ratings. They provide step-down power to supply plant auxiliary loads—for example, a 480 - 240/120-Vac transformer that supplies power to auxiliary lighting panels. Transformers Review equipment ratings 5 years NERC Planning Standard FAC-009-1 Infrared scan, while loaded Annually NFPA 70B, 20.17 Doble test if oil-filled 3-6 years FIST Volume 3-30 Dissolved gas analysis if oil-filled Annually Reclamation Recommended Practice FIST Volume 3-30 NFPA 70B, 9.2.8"
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "7-8. Transformer insulating liquids.",
+        "pages": "99",
+        "text": "Tetrachloroethylene (Wecosol) fluid used in nonflammable fluidinsulated transformers, can evaporate to produce toxic fluids and its use should not be an allowable option in facility design manuals/specifications. b. Air and moisture are the major enemies of insulating liquids . The oxygen in the air will cause the formation of acids and sludge in the oil. Moisture, in as small an amount as 10 parts per million by volume, can reduce the dielectric strength of insulating oil to below its acceptable value. All containers and equipment used for handling insulating liquids must be clean. Equipment used with mineral oil should never be used with less-flammable liquids, as any mineral oil residue will change the less-flammable liquid’s fire-point characteristics. Transformers should not be retrofilled with a different type of insulating liquid, as this can cause the transformer to malfunction. Likewise, great care must be used to ensure that any liquid used to “top off” a transformer is compatible in all respects with the liquid already in it."
+      },
+      {
+        "id": "S5",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "8. Potheads and Stress Cones 8.1 General",
+        "pages": "30-31",
+        "text": "Potheads and stress cones provide mechanical support and electrical insulation for cables. Insulating capability of these devices is important to prevent a fault and resulting forced outage. Visual inspection for leaks, cracks Annually NFPA 70B, 10.2.4 Annex H.2 Doble AC loss measurement (hot collar) or DC ramp with cable 3-6 years FIST Volume 3-1 Doble Reference Book on Cables and Accessories Visual inspection and infrared scan, while loaded Annually NFPA 70B, 20.17 Coupling capacitor/voltage transformers (CCVTs) are instrument transformers which provide a path for communications (traveling over the transmission line) to reach communication and relaying equipment without allowing power system frequency energy to pass. These are static devices requiring relatively little maintenance. Except for infrared scanning, maintenance must be conducted with equipment de-energized. This equipment normally is oil-filled and must be checked for oil leaks. It is subject to catastrophic explosive failure when not tested on schedule."
+      },
+      {
+        "id": "S6",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "32. Transformer Fire Suppression Systems 32.1 General",
+        "pages": "58",
+        "text": "Reclamation generator step-up (GSU) transformers normally contain thousands of gallons of flammable transformer oil. Based on Reclamation’s past practice, on NFPA 851 “Fire Protection for Hydroelectric Generating Plants,” and Edison Electric Institute’s “Fire Protection for Transformers,” Reclamation requires fire suppression for mineral oil-filled GSU transformers. Suppression Systems Annually run pump with water flow NFPA 25, 8.3.3 FIST Volume 3-32 Fire pumps Maintenance See manufacturer’s instruction"
+      },
+      {
+        "id": "S7",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "31.4 Instrument Transformers 31.4.1 General",
+        "pages": "55-56",
+        "text": "Instrument transformer secondary wiring always should be checked for integrity after any work that may have disrupted these circuits. Instrument transformers that are oil-filled will fail catastrophically and cause hazards to workers if not maintained properly. Any oil leak should trigger immediate Doble testing and replacement planning. 4 kVA = kilovoltampere. Review equipment ratings 5 years NERC Planning Standard Burden measurements 5 years FIST Volume 3-8 Doble test if oil-filled 5 years Reclamation Recommended Practice Visual inspection Annually Reclamation Recommended Practice Infrared scan Annually NFPA 70B, 20.17 31.5 Dry-Type Power Transformers – 500 kVA and Larger Dry-type power transformers are air cooled, having no liquid insulation. Typical applications include station service and excitation system transformers."
+      },
+      {
+        "id": "S8",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "14-3. Battery safety.",
+        "pages": "149",
+        "text": "The hydrogen gas produced by charging batteries is flammable in an atmosphere where the gas content exceeds 4 percent hydrogen gas. If the mixture contains more than 8 percent hydrogen, it can explode. b. Electrolyte hazard. Battery rooms are required by OSHA to provide emergency-use quick-drenching facilities for the eyes and body within 25 feet of the work area. Permanent emergency eyewash and showers are recommended. Portable emergency eyewash and showers must be brought into the maintenance area if permanent facilities are not provided. Squeeze bottles can substitute for eyewash fountains, and canisters that resemble fire extinguishers can be fitted to provide an eyewash or a quick drench. Periodic inspection and maintenance of these devices are mandatory. Be sure to change the water as recommended to eliminate possible bacteria. Squeeze bottles are date coded and should be replaced before the expiration date. Exercise canister units periodically to prevent clogging of the head. Ensure that a good flow of water is available when it’s really needed. c. Explosive gas hazard."
+      },
+      {
+        "id": "S9",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "31.5.1 General",
+        "pages": "56-57",
+        "text": "Dry-type power transformers are air cooled, having no liquid insulation. Typical applications include station service and excitation system transformers. Review equipment ratings 5 years NERC Planning Standard FAC-009-1 Infrared scan Annually NFPA 70B, 20.17 FIST Volume 3-30 Temperature alarm check Annually NFPA 70B, 9.3 Annex H.2(c) FIST Volume 3-30 Visual inspection/cleaning Annually NFPA 70B, 9.3 Annex H.2(c) FIST Volume 3-30 Check fan operation Annually NFPA 70B, 9.3 Annex H.2(c) FIST Volume 3-30 Clean fans and filters Annually NFPA 70B, 9.3 Annex H.2(c) FIST Volume 3-30 Turns ratio test 3-6 years or if problems are suspected NFPA 70B, 9.3 Annex H.2(c) NFPA 70B, 20.11 Megger® windings or Hipot 3-6 years or when problem is suspected NFPA 70B Annex H.2(c) NFPA 70B, 9.2.9 and 20.9 Oil-filled transformers generally deliver power to and from the main units of the facility—for example, generator step-up transformers. These transformers are generally located outside the building in a transformer bay or in a switchyard. These transformers may be two-winding or more and include autotransformers."
+      },
+      {
+        "id": "S10",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "8. Potheads and Stress Cones 8.1 General",
+        "pages": "30-31",
+        "text": "Potheads and stress cones provide mechanical support and electrical insulation for cables. Insulating capability of these devices is important to prevent a fault and resulting forced outage. Visual inspection for leaks, cracks Annually NFPA 70B, 10.2.4 Annex H.2 Doble AC loss measurement (hot collar) or DC ramp with cable 3-6 years FIST Volume 3-1 Doble Reference Book on Cables and Accessories Visual inspection and infrared scan, while loaded Annually NFPA 70B, 20.17 Coupling capacitor/voltage transformers (CCVTs) are instrument transformers which provide a path for communications (traveling over the transmission line) to reach communication and relaying equipment without allowing power system frequency energy to pass. These are static devices requiring relatively little maintenance. Except for infrared scanning, maintenance must be conducted with equipment de-energized. This equipment normally is oil-filled and must be checked for oil leaks. It is subject to catastrophic explosive failure when not tested on schedule."
+      }
+    ]
+  }
+]

@@ -99,6 +99,34 @@ materialized views would remove most of that.
 | Question on flags + manuals (screenshot above) | 3 | 12.9k | $0.069 |
 | Manual question on the Azure deployment (13 s end to end) | 2 | 8.2k | $0.048 |
 
+**Answer quality, end to end** (36 cases through the real agent; judge Claude Sonnet 5.5, a
+different model from the app's Opus 5.5;
+[eval/results/answers/full](eval/results/answers/full/summary.json)):
+
+| Case type | What is checked | Result |
+|---|---|---|
+| Manual questions (24: 12 development, 12 held-out) | correct against the reference answer (judge) | 24 / 24 |
+| | the right passage was retrieved and cited (programmatic) | 24 / 24 |
+| | **fully faithful**: no claim beyond the retrieved passages (judge) | **6 / 24** (1.75 unsupported claims per answer on average) |
+| Data questions (8; truth computed live in SQL) | the expected numbers appear / the right tool was used | 8 / 8, 8 / 8 |
+| Out-of-scope (4, e.g. DIN EN 50341 clearances) | declines and invents no value (judge) | 4 / 4 |
+
+The run cost $1.49 (median $0.042 per case including the judge); median latency 9.4 s.
+
+What this shows:
+* **Correctness saturates**: these questions are too easy to separate variants on; the
+  discriminating metric is faithfulness.
+* **Faithfulness is the weakness**: answers are right and cite the right passage, but add
+  material that is not in the passages. Two kinds: general knowledge from the model ("sea fog
+  makes it worse") and caveats that the system prompt itself asks for (pointing to DIN EN /
+  IEC). The evaluation exposed that conflict in my own prompt.
+* **Judge checks:** before the run, the judge rated the reference answer correct and rejected an
+  empty answer, "I don't know" and an answer to a different question; for out-of-scope it
+  accepted a refusal and rejected an invented value. A blind human review of 10 judged cases
+  is prepared in [human_review.md](eval/results/answers/full/human_review.md); agreement is not
+  measured yet.
+* One run, small n: confidence intervals are wide (faithfulness 0.25 ± 0.18).
+
 ## Run it
 
 Requires Docker. Put a Claude API key in `.env` (`ANTHROPIC_API_KEY=...`, see `.env.example`).
@@ -145,9 +173,10 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -e ".[ml,dev]"
 docker compose up -d db
 alembic upgrade head
-pytest                                        # 37 tests; DB tests use a separate test database
+pytest                                        # 41 tests; DB tests use a separate test database
 python -m inspection_copilot.ingest           # manuals into the dev database
-python -m inspection_copilot.eval_retrieval   # retrieval evaluation
+python -m inspection_copilot.eval_retrieval   # retrieval evaluation (free, local)
+python -m inspection_copilot.eval_answers --run full   # answer quality (~$1.50, Claude API)
 uvicorn inspection_copilot.main:app --reload
 ```
 
@@ -162,6 +191,12 @@ uvicorn inspection_copilot.main:app --reload
   `paraphrase` questions that avoid the source wording; results are reported per category.
 * **Held-out set:** 21 questions on other topics, committed before BM25 was implemented, so
   the method change could not be tuned to them.
+* **Answer quality** ([eval_answers.py](src/inspection_copilot/eval_answers.py)): calls the real
+  agent, with the paid vision-review tool disabled (no writes, no extra cost). Programmatic
+  checks where possible (numbers vs. live SQL, tool used, evidence cited); an LLM judge with a
+  JSON-schema output for correctness, faithfulness and refusals. Results are written per case
+  as they finish (resumable), failures go to a separate error file instead of counting as wrong,
+  and the cost estimate came from a 4-case pilot (estimated $1.48, actual $1.49).
 * **Agent tests** use a scripted fake Claude client (no key, no cost): parallel tool results,
   unknown tools, step cap, refusals. CI runs lint, migrations and all tests against PostgreSQL
   with pgvector and builds the Docker image.

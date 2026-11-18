@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Why do insulators near the sea need more attention?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"insulator contamination salt coastal areas cleaning flashover\"\n}",
+    "result_summary": "5 passages: S1 p.23, S2 p.55-56, S3 p.55-56, S4 p.27, S5 p.23-24",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "Mainly because **salt builds up on the insulator surface and makes flashover more likely**. Sea fog and mist make it worse.\n\n**Why it matters**\n- Salt deposits build up along coasts and \"materially reduce the flashover value\" [S1].\n- A dry salt layer is not the main danger. The risk comes when it gets wet, because the wet layer can carry current across the surface. Morning mist or fog followed by dust and wind is called out as a way harmful deposits build up [S1]. The bushing inspection guidance also lists salt among deposits that can cause flashover under moist conditions [S4].\n- These deposits can be very hard to remove. Sometimes the insulator has to be taken out of service and cleaned by hand [S1].\n\n**What the manuals recommend for these areas**\n- **Use stronger insulation.** For a salt-water coastline with medium-to-heavy fog, use the higher \"B\" insulator class instead of the \"A\" class meant for dry areas [S2][S3].\n- **Clean more often.** Insulators in badly contaminated air may need frequent cleaning. Choosing insulators with a higher flashover level helps, but you still have to clean them [S2].\n- **Long-leakage insulators** help, but where deposits are severe they still need washing as often as standard ones [S1].\n- **Silicone grease** can stretch the time between cleanings, but only on ceramic insulators. Don't use it on composite (non-ceramic) insulators: an arc running along the greased surface can cause tracking [S1][S5].\n- **Inspect closely** for deposits, rust on fittings and signs of earlier flashovers [S1][S4].\n\nThese are older US manuals (US Army TM 5-684, 1996). For current European practice, insulators are selected by how polluted the site is under IEC/DIN EN rules (IEC TS 60815). The manuals I searched don't cover that standard, so check it directly before using these points for design."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "(1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination. However, alternate wetting by early morning mist and fog, followed by exposure to dust and wind, can build up harmful deposits. Special contamination problems are encountered near steel mills, cement and chemical plants, and other factories that saturate the air with finely divided, semi-conductive particles. Along coastal areas, salt deposits build up and materially reduce the flashover value. Many of these deposits are extremely tenacious, requiring that the insulator be removed from service and cleaned by hand. Where contamination is serious, specia l longleakage suspension insulators for high-voltage lines have been used; but, where severe deposits occur, washing of special insulators is required as often as for standard insulators. To lengthen maintenance intervals, in areas where contamination is severe, ceramic insulators and bushings may be coated with special silicone greases."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-47. Pole line insulator class requirements.",
+        "pages": "55-56",
+        "text": "Use the B value in areas where medium-to-heavy fog is common occurrence and there is medium industrial contamination along a salt-water coast line. _4-24 b. Altitude derating. As altitude increases the insulation value of air decreases, so that an insulator at a high elevation will flashover at a lower voltage than the same insulator at sea level. The lo w frequency dry flashover value of an insulator at 7,000 feet (2,100 meters) is about 80 percent of the low frequency dry flashover at 1,000 feet (300 meters). c. Cleaning. Insulators in severely contaminated atmospheres may require frequent cleaning . Pollutant buildup increases operating stresses an d increasing the flashover level will help compensate for this. Such an increase does not eliminate the need for cleaning insulators. Guys are used whenever the line wires would tend to pull the pole out of its normal position because of unbalanced forces from dead-ended conductors, changing conductor sizes or material, or other conditions. The vertical forces of the line are resisted by the pole, while the guy counteracts the unbalanced horizontal components. a."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-47. Pole line insulator class requirements.",
+        "pages": "55-56",
+        "text": "57-1 A 1 80 39 57_1 B 1 80 13.2 55 23.0 75 34.5 loo 57-l A 1 80 57-2 B 1 110 57-2 A 1 110 57-3 B 1 125 57-3 A 1 125 57-4 B 1 150 Facility voltage level (kV) up to 5 6 to 15 16 to 25 26 to 35 up to 5 6 to 15 16 to 25 26 to 35 up to 5 6 to 15 16 to 25 26 to 35 ’ The rated dry flashover voltage is based on manufacturer’s tests where more than one insulator is required. 2 Use the A value in areas where the atmosphere is dry (desert) or where fog occurs only to a limited degree and there is not more than moderate industry contamination. Use the B value in areas where medium-to-heavy fog is common occurrence and there is medium industrial contamination along a salt-water coast line. _4-24 b. Altitude derating."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-33. Maintenance of bushings.",
+        "pages": "27",
+        "text": "(2) Contamination.Check for foreign deposits, such as dirt, salt, cement dust, rust, carbon, acid oil sludge, filler compound, copper sulfate, or other material that may cause flashover under moist conditions. (3) Loose porcelain. Check for loose or improper seating of the lower porcelain. (4) Evidence of flashover. Flashover may be caused by an operating voltage above the bushing rating, excessive transient voltage, o r semiconductive foreign particles contaminating the porcelain. d. Porcelain repair. In addition to the upper or main body porcelain, some bushings have a lower- porcelain member to give added strength against mechanical shock. Porcelain repairs generally are made in either of the following ways: (1) Fractures. When the main section of either the lower or upper porcelain is fractured, replace the bushing. When the cause appears to be a too rigid connection, install a flexible connector or expansion joint made from a flat strap, in addition to replacing the bushing. (2) Chips."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23-24",
+        "text": "To lengthen maintenance intervals, in areas where contamination is severe, ceramic insulators and bushings may be coated with special silicone greases. Greasing is not recommended for nonceramic insulators, a channeled arcing can lead to tracking on greased composite insulators. Many weathershed materials are unsuitable in areas where hydrocarbon vapors are prevalent or where they come in contact with wood poles treated with hydrocarbons. b. De-energized cleaning methods an d materials for ceramic insulators. The following materials and methods are specified for porcelain cleaning. Table 3-2 should also be consulted. (1) Clean, grit-free , lintless wipers should be used. (a) Wire-brush rusty spots down to bare metal. Apply priming coat of paint and dry. Apply (2) An abrasive, of the kitchen-cleanser type, finish coat of paint to spots covered with primer. mixed with clear water to the consistency of a thick paste, may be applied with a wiper or stiff-bristle (b) Replace insulator if loose cement permits brush. The amount of rubbing depends on the mamovement between porcelain and metal parts. terial being removed. Rinse freely with clear water. Table 3-2."
+      }
+    ]
+  }
+]

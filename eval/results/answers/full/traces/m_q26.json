@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Is it safe to spray water on lightning protection devices while the line is live?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"washing surge arresters lightning arresters energized water spray\"\n}",
+    "result_summary": "5 passages: S1 p.66, S2 p.69, S3 p.117, S4 p.117, S5 p.116",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"live line insulator washing precautions\"\n}",
+    "result_summary": "5 passages: S6 p.170, S7 p.65-66, S8 p.65, S9 p.64, S10 p.66",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**Not by default.** The manual says energized washing of surge arresters (lightning arresters) can put severe electrical stress on them because of voltage imbalance. It **should not be done unless the arrester manufacturer agrees** [S1]. More generally, nobody should touch or work on a surge arrester while it is connected to a live source [S4].\n\n**If the manufacturer does approve it**, the usual rules for live-line washing still apply:\n- **Water quality:** Use water with a resistivity above about 1,500 ohm-cm, and never below 1,000 ohm-cm. Check it regularly while washing, especially in hot weather. Don't add soap, detergent, antifreeze or alcohol [S1].\n- **Nozzle:** Use a jet nozzle for transmission voltages and a spray nozzle for distribution voltages [S1].\n- **Operator safety:** How much leakage current can reach the operator through the water stream depends on how far the nozzle is from the conductor, the water's resistivity, the water pressure and the nozzle opening size. Wind also affects the spray [S10].\n- **Washing interval:** Wash often enough that contamination never builds up past the acceptable limit. Otherwise it can cause a flashover during washing [S10].\n- **Who and how:** Only trained, qualified people should do live-line work, or a qualified contractor [S8]. Each facility should write its own procedures, preferably using advice from the local utility [S10]. The full details are in ANSI/IEEE 957 [S10].\n\n**Caveat:** This comes from US Army TM 5-684 (1996), an older US document. It doesn't reflect current EU or German rules, such as DIN EN 50110 or the IEC live-working standards. Check your own operator's live-working rules and the specific arrester manufacturer's instructions before doing this."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-65. Live-line operations.",
+        "pages": "66",
+        "text": "Some points, covered in more detail in ANSI/IEEE 957, are as follows: (a) Water resistiuity . Water having a resistivity greater than 1500 ohm-centimeters can usually be obtained from city water system hydrants. This is an acceptable low-level resistivity. Water resistivity changes inversely with temperature and must be measured periodically during washing operations, especially in hot weather. In no case should water be used having a resistivity of below 1,00 0 ohmcentimeters. No soap, detergents, anti-freeze, or alcohol should be added. (b) Nozzle type.A jet nozzle is more suited to transmission (high-voltage) systems because wind effects the spray less and the spray range is greater. The spray nozzle is suited for distribution (mediumvoltage) systems. (c) Apparatus. Consult manufacturers when washing nonceramic insulators. Bushings made of porcelain must be treated with great care and the effects of water pressure and volume and the mechanical support provided the bushing must be considered. Energized washing of surge arresters may impose severe electrical stresses on the arresters due to voltage imbalance and should not be done without the consent of the arrester manufacturer."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "5-2. General construction guidance.",
+        "pages": "69",
+        "text": "Lightning protection and grounding. Lightning protection for aerial to underground primary cable connections, and grounding and bonding of underground cables, contribute to the protection of the cables and to the safety of the system. (1) Surge arresters . When a transition is made between overhead conductors and underground or submarine primary cables, facility practice requires that a surge arrester be installed at the termination connecting insulated underground cables to aerial bare conductors. A ground rod should be installed and the metallic sheath or armor of the cable bonded to that ground installation. The surge arrester then protects the primary cable from switching or lightning surge overvoltages which could overstress the cable insulation. Secondary cables are usually protected from these over-voltages by primary surge arresters located at pole o r groundmounted transformer installations. (2) Grounding and bonding . All noncurrentcarrying conductive materials in the structure and any neutrals must be grounded. Most standard structures are provided with a driven ground rod."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "9-8. Maintenance of surge arresters.",
+        "pages": "117",
+        "text": "(a) Damaging fumes or vapors. (b) Excessive dirt or other current-conducting deposits. (c) Excessive humidity, moisture, dripping water, steam, or salt spray. (d) Abnormal vibrations or shocks. (e) Ambient temperatures in excess of 40 degrees C. (5) Any external gaps are free from foreign objects and set at proper spacings. b. Electrical tests. Visual inspection will not always detect a damaged arrester. Interior damage may result from a broken element, presence of moisture, a severe direct lightning stroke, or the use of an arrester with an incorrect rating. Sometimes these conditions will cause radio interference. Electrical tests, to detect inferior arrester units, may be made either in the field or shop. Tests must be made strictly in accordance with manufacturer’s recommendations, and the results interpreted in line with manufacturer’s criteria. (1) Power factor tests . Each type and class of lightning arrester has a specific power factor when new. Periodic testing of a unit will show little deviation from the original (when new) power factor, so long as it remains in good operating condition."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "9-8. Maintenance of surge arresters.",
+        "pages": "117",
+        "text": "It is recommended that units found to be defective be replaced rather than repaired: Where an arrester is composed of two or more individually complete units, each unit should be tested separately. Thus, a bad unit may readily be replaced and the good units retained. Surge arresters are almost always applied with one terminal connected to an electrically energized source and one terminal to ground. No work should be done, or contact made with surge arresters, when connected to the energized source. a. Visual inspections. Visual inspection should be made periodically to ensure that: (1) The line lead is securely fastened to the line conductor and the arrester. (2) The ground lead is securely fastened to the arrester terminal and ground. (3) The arrester housing is clean and free from cracks, chips, or evidence of external flashover. (4) The arrester is not located in such a manner as to be subject to: (a) Damaging fumes or vapors. (b) Excessive dirt or other current-conducting deposits. (c) Excessive humidity, moisture, dripping water, steam, or salt spray. (d) Abnormal vibrations or shocks."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II-SURGE (LIGHTNING) ARRESTERS 9-5. Definition of a surge arrester.",
+        "pages": "116",
+        "text": "A surge arrester is a protective device for limiting surge voltages on equipment by discharging or bypassing surge current. Surge arresters allow only minimal flow of the 60-hertz-power current to ground. After the high-frequency lightning surge current has been discharged, a surge arrester, correctly applied, will be capable of repeating its protective function until another surge voltage must be discharged. Surge arresters used for protection of exterior electrical distribution lines will be either of th e metaloxide or gapped silicon-carbide type. Expulsion-type units are no longer used. a. Metal-oxide type. A metal-oxide surge-arrester (MOSA) utilizing zinc-oxide blocks provides the best performance, as surge voltage conduction starts and stops promptly at a precise voltage level, thereby improving system protection. Failure is reduced, as there is no air gap contamination possibility; but there is always a small value of leakage current present at power frequencies. Therefore, the arrester’s maximum power-frequency continuous operating voltage (MCOV) can not be exceeded. b. Gapped silicon-carbide type . Silicon-carbide has more nonlinearity than zinc-oxide."
+      },
+      {
+        "id": "S6",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "15-18. Care of live-line tools.",
+        "pages": "170",
+        "text": "Arrange for tests with the manufacturer, serving utility, or local testing laboratory. b. Tool inspection. OSHA requires that live-line tools be visually inspected daily before use. Tools to be used will be wiped clean. If any hazardous defects are indicated, tools will be removed from service. The following field observations warrant their removal from service. (4) Failure to pass an electronic test using portable electronic live-line tool testers; or failure to pass a moisture test using portable moisture meters developed to test live-line tools. c. Tool cleaning. Clean live-line tools before each use with a clean absorbent paper towel or cloth and then wipe with a silicone-treated cloth. Waxing is not necessary after every use, but only as needed. Use cleaning and waxing kits manufactured for live-line tools and follow directions for their use. Never use cloths that have been washed in harsh solvents, soap, or detergents. Residues left on the tools will be conductive. Abrasives can destroy the surface gloss of the tool and cause water or moisture beads to form on the surface of the tool."
+      },
+      {
+        "id": "S7",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-65. Live-line operations.",
+        "pages": "65-66",
+        "text": "Chapter 15, section V discusses these requirements. b. Operations. The most common live-line maintenance operations are as follows: (1) (2) (3) (4) (5) (6) (7) (8) Replacing poles. Replacing crossarms. Replacing insulators. Washing insulators. Cutting out and replacing live conductors. Tapping a hot line. Applying armor rods or vibration dampers. Phasing conductors. c. Procedures for replacing poles, crossarms, and insulators. To replace any of these items requires that the conductors must be untied or unclamped from their insulators and temporarily supported. (1) Poles. In overhead line maintenance, pole replacement is usually the result of deterioration or damage to the pole. The new pole should be set and the wire tongs, saddles, and other tools needed to support the existing line while moving it to the new pole should be provided. If the old pole must be used to support any tools, temporary bracing may need to be installed to strengthen the weakened pole. (2) Insulators. The usual procedures in the replacement of insulators are as follows: - (a) Fasten the wire tongs to the conductor."
+      },
+      {
+        "id": "S8",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-64. Energized-line methods.",
+        "pages": "65",
+        "text": "Barehand procedures require a knowledge of all three methods covered previously and dictate making periodic re-examinations of the worker’s ability to safely use the barehand technique. All tools and equipment must be in excellent condition and should be maintained solely for the purpose of performing live-line maintenance. (2) Qualified personnel. Consideration should be given to having this type work done by a qualified contractor, unless the in-house personnel are fully qualified, adequately equipped, and perform this work frequently enough to maintain their proficiency. All live-line operations require special tools and equipment to perform the variety of work procedures involves in hot-line maintenance. a. Tools and equipment. The tools and equipment used in live-line maintenance are made specifically for this type of work. They are required to meet applicable acceptance test standards and they must be cared for and maintained to meet in-service standards. Chapter 15, section V discusses these requirements. b. Operations. The most common live-line maintenance operations are as follows: (1) (2) (3) (4) (5) (6) (7) (8) Replacing poles. Replacing crossarms. Replacing insulators. Washing insulators."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-61. Posionous plants.",
+        "pages": "64",
+        "text": "No brush should be used, as this would irritate the skin. Clothing exposed to the poison should also be thoroughly cleaned. 4-62. live-line maintenance requirements. With the use of various types of aerial equipment and hot-line tools, many operations in the maintenance of overhead distribution lines may be performed while these lines are energized. Safety precautions are of utmost importance and personnel engaged in this type work must be thoroughly trained in the procedures and use of the tools and equipment. Departmental safety publications should be consulted for restrictions and certification requirements on live-line maintenance at various voltage levels. Also see requirements in chapter 1, section II. Trained personnel should be familiar with ANSI/IEEE 516 and ANSI/IEEE 935, which provide expanded guidance on energized power-line maintenance methods and live-line tool care. The “Lineman’s and Cableman’s Handbook” provides pictorial data on tools, equipment, and live-line operation techniques. Energized-line maintenance means work on any line electrically connected to a source of potential difference, or electrically charged so as to have a potential difference from ground."
+      },
+      {
+        "id": "S10",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-65. Live-line operations.",
+        "pages": "66",
+        "text": "(1) Facility procedures. Each facility should develop procedures based on their level of voltages, contaminants, and available equipment. Using advice from the local utility concerning their energized insulator washing practices is recommended. (2) Energized cleaning methods. Energized cleaning methods include the use of high pressure, medium-pressure,and low-pressure water; compressed air with abrasive dry cleaning compounds; and wiping with burlap cleaning hammocks using hot sticks. All of these procedures are covered in ANSI/IEEE 957. (3) Technical considerations of pressurized water cleaning. Certain items influence the effectiveness of pressurized water cleaning performance and the leakage current that can pass to the operator’s body from the water stream. These items are the nozzle conductor distance, the water’s resistivity, the water pressure, and the nozzle-orifice diameter. Wind can interfere with the efficiency of the water spray. The washing interval must be such as to avoid flashover accidents during hot-line washing, which can occur when the acceptable limit of contamination has been exceeded. Some points, covered in more detail in ANSI/IEEE 957, are as follows: (a) Water resistiuity ."
+      }
+    ]
+  }
+]

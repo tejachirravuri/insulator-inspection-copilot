@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How long should I wait after switching off a power factor correction bank before working on it?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"capacitor bank discharge wait time after de-energizing before working\"\n}",
+    "result_summary": "5 passages: S1 p.144, S2 p.144, S3 p.146, S4 p.146-147, S5 p.104",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"power factor correction capacitors safety grounding before maintenance\"\n}",
+    "result_summary": "5 passages: S6 p.144, S7 p.24, S8 p.25-27, S9 p.181, S10 p.24-25",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**Wait at least 5 minutes after switching off the capacitor bank. Then short the capacitor terminals to ground and to each other before you touch anything** [S1][S2].\n\nKey points from the manual (US Army TM 5-684):\n- **Capacitors stay charged after they're switched off.** That's why you need the wait and then the manual shorting [S2].\n- **Don't rely on the built-in discharge resistors.** Most power capacitors have one, but the manual says it's not advisable to depend entirely on it [S1]. The internal discharge device doesn't replace discharging the stored charge by hand [S4].\n- **Leave the grounds on until all work on the installation is finished** [S1][S2].\n- **Before working on the switches, both sides of every phase must be switched off and properly grounded** [S5].\n\nThis comes from a 1996 US Army manual, not current EU or German rules. If you work under DIN VDE 0105-100 / EN 50110 or similar local rules, those rules come first. So does the discharge time the capacitor maker gives on the nameplate or in the manual. Always check with a suitable voltage tester that the bank is dead before you apply the grounds."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section I-CONSIDERATIONS Section II-MAINTENANCE AND INSPECTION 13-5. Ensuring safe capacitor deenergizing.",
+        "pages": "144",
+        "text": "After capacitors are deenergized allow at least 5 minutes for discharge and then short the capacitor terminals to ground and to each other. These grounding provisions should remain until work on the installation is completed. Although most power capacitors have a discharge resistor installed to automatically discharge them after they are disconnected from the circuit, it is not advisable to depend entirely on such resistors for safety. The initial inspection should be made within 24 hours after energizing a new capacitor installation. This inspection should be made at a time of maximum circuit voltage, usually during the first period of light load on the circuit. In addition to visual observations, this inspection should include voltage and current readings to ensure that voltages and currents do not exceed capacitor rating limits. Operating kilovars (the sum of the fundamental frequency kilovars and any harmonic frequency kilovars) should not exceed 135 percent of the capacitor rating. Routine maintenance and inspection should be accomplished at least four times per year."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "13-3. Application of power capacitors.",
+        "pages": "144",
+        "text": "Fixed shunt capacitors are used to improve the voltage level and switched shunt capacitors are used to improve voltage regulation. Capacitor installations will generally be connected grounded wye because of undesirable effects of other connections. All capacitor banks should be equipped with a means to disconnect them from the electric system. Some systems utilize ungrounded connections to minimize interference and because this connection is considered easy to fuse. Capacitors containing polychlorinated biphenyl (PCB) should have been disposed of under the procedures of the Environmental Protection Agency to implement the Toxic Substances Control Act of marked as containin g PCB’s. ANSI/IEEE 18 now requires an impregnant identification visible from the ground with a glue color used to designate a nonPCB liquid. Capacitors retain a charge after they ar e deenergized. After capacitors are deenergized allow at least 5 minutes for discharge and then short the capacitor terminals to ground and to each other. These grounding provisions should remain until work on the installation is completed."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section III-TESTS",
+        "pages": "146",
+        "text": "This test may be applied to two bushing, single-phase capacitor units, but not to capacitor units where the case is used as a terminal. Table 13-2. Capacitor bank oil switch maintenance 1 .- Maintenance schedule, Type of control years Time clock 3 Voltage 3 Dual temperature 5 Temperature only 8 Time clock and temperature . . 8 From “The Lineman’s and Cableman’s Handbook” b y Kurtz and Shoemaker, copyright 1992 by McGraw-Hill, Inc., used with the permission of McGraw Hill, Inc. Terminal tests may be those measuring resistance, as recommended by ANSI/IEEE 18, or may be handbook-recommended insulation or voltage tests. a. ANSI/IEEE 18 resistance tests. Two-bushing capacitors can be tested to determine whether their insulation resistance (in reference t o terminal-toterminal or terminal-to-case) is in agreement with a value recommended by the manufacturer. When an internal discharge resistor is present, however, the reading obtained will be that of the discharge resistor. This is much lower than the dielectri c resistance, which may also need to be obtained from the manufacturer."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "13-13. Terminal tests of power capacitors.",
+        "pages": "146-147",
+        "text": "When an internal discharge resistor is present, however, the reading obtained will be that of the discharge resistor. This is much lower than the dielectri c resistance, which may also need to be obtained from the manufacturer. This testing will indicate whether the internal discharge resistor is operable . Remember, that the internal discharge device provided in a capacitor is not a substitute for the recommended practice of manually discharging the residual stored charge before working on a capacitor. (a) Procedure. With the capacitor unit insulated from ground, apply a voltage equal to twice rated voltage between case and terminals (all terminals connected together) in accordance with figure with the test circuit fused and containing sufficient impedance to limit the current, should the capacitor under test be shorted. b. Handbook tests. These are not standard industry tests, but have been recommended by facility engineers as a method of determining the capacitor \\ FUSE AN0 FREQUENCY condition. Figure 13-1. Terminal-to-terminal voltage test circuit. / 1 MAXIMUM + CAP”uC$R / POWER SOURCE 1 RATED VOLTAGE 1. 1 CAPACITOR CASE INSUIA~EO Figure 13-2."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-10. Operation of Switches.",
+        "pages": "104",
+        "text": "Freeing of an iced switch mechanism may be assisted by a few sharp raps on the vertical operating pipe or suddenly applied tugs on the operating handle. (3) Operate power-operated switches periodically to ensure that their mechanisms and control features are functioning properly. If the circuit cannot be de-energized to operate a switch, the operating mechanism should be disengaged from the linkage. Check control circuits and mechanisms in the disengaged manner, unless disengagement will change the overall adjustment. b. Disconnecting switches: (1) Check that no load is being carried by the switch, prior to operating a disconnecting o r horngap switch. (2) Check to determine that operation does not remove necessary safety grounds, prior to opening a grounding switch. Check the circuit to confirm that it is not energized, prior to closing. (3) Operate disconnecting switches rapidly to reduce arcing time and possible burning of contacts. No workshould be done on switches until both sides of eac hphase are de-energized and properly grounded. In addition to the recommendations given herein, follow the specific maintenance directions of the switch manufacturer."
+      },
+      {
+        "id": "S6",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section I-CONSIDERATIONS Section II-MAINTENANCE AND INSPECTION 13-5. Ensuring safe capacitor deenergizing.",
+        "pages": "144",
+        "text": "After capacitors are deenergized allow at least 5 minutes for discharge and then short the capacitor terminals to ground and to each other. These grounding provisions should remain until work on the installation is completed. Although most power capacitors have a discharge resistor installed to automatically discharge them after they are disconnected from the circuit, it is not advisable to depend entirely on such resistors for safety. The initial inspection should be made within 24 hours after energizing a new capacitor installation. This inspection should be made at a time of maximum circuit voltage, usually during the first period of light load on the circuit. In addition to visual observations, this inspection should include voltage and current readings to ensure that voltages and currents do not exceed capacitor rating limits. Operating kilovars (the sum of the fundamental frequency kilovars and any harmonic frequency kilovars) should not exceed 135 percent of the capacitor rating. Routine maintenance and inspection should be accomplished at least four times per year."
+      },
+      {
+        "id": "S7",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "24",
+        "text": "This chapter is provided to serve as a guide in making coupling capacitor tests by a Doble power factor test set. Figure 1 shows a typical coupling capacitor installation. Note that an installation generally consists of the porcelain-clad capacitor unit(s) and a base housing carrier-current and/or potential-device networks. If field test results are to be compared with nameplate or earlier field data, test procedures must be consistent. Also, knowledge of the carrier and potential-device networks is necessary in order that they be properly grounded or disconnected to eliminate any effect they might have on the measurement. The test procedure outlined under Figure 1 is designed to produce the data required for individual units with a minimum of disconnection, while enhancing safety and reducing the effects of electrostatic interference. Test data should be recorded on the Doble \"Miscel­ laneous Equipment\" form. The report form should include complete information regarding the capacitor manufacturer, type, rating, serial number, and nameplate data (capacitance and power factor)."
+      },
+      {
+        "id": "S8",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "25-27",
+        "text": "B2 will be found grounded if the capacitor is used only with a potential device. 5. Test as follows: To Measure Energize Ground Guard UST C(T2-T1) B1 =T2 T1 B3 ** - C(B1-B3) B1 = T2 T1 - B3 C(B1-B2) B1 =T2 T1 - B2 C(B3-B2) B3 * T1 - B2 *Test voltage not to exceed rating of Tap or Auxiliary Capacitor. **To make certain that all the current in the parallel circuit will be subtracted from the meter reading, vary the procedure slightly in that after applying the safety ground and closing the ground switches, disconnect the capacitor from the power line and test C(T2-T1) by energizing T2 and UST T1. (FIST 3-25 6/91) 2 Failures of Pedestal-type (Pin and Cap) Insulators The problem of failure of pedestal-type insulators first appeared on a 34.5-kV bus at a Reclamation substation in 1962. Since that time, similar failures have occurred on 12.47-kV, 34.5-kV, 41.8-kV, and 69­ kV bus Installations at many other locations."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "16-12. Electric power quality data.",
+        "pages": "181",
+        "text": "Verify that panelboard loads are balanced, where applicable, and check wiring and grounds. A majority of power quality problems result from loose connections and improper grounding techniques,and unbalanced loads. If correcting these deficiencies does not alleviate excessive harmonics, then harmonic mitigation measures must be developed utilizing engineering solutions beyond the scope of this manual. AIthough harmonic mitigation is not the responsibility of the electrical supervisor, it is the supervisor’s responsibility to kee p informed on both the quantity and quality of electrical service available to facility users. Therefore, an awareness of apparatus actions, which may indicate unacceptable harmonic levels, is necessary to determine where more precise data should be acquired. a. Capacitors .Capacitor impedance decreases with frequency, and a capacitor bank acts as a harmonic sink where most harmonic problems are first noticed. Fuse blowing, without any obvious reason, or a capacitor unit failure, can be signs of a possible harmonic problem. A supply system inductance, in resonance with the capacitor bank, can cause large currents and voltages to develop."
+      },
+      {
+        "id": "S10",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "24-25",
+        "text": "Wherever electrical fields exist that cause interference with the Doble testing procedure, an lCD (Interference Cancellation Device) should be used. References: 1961 Doble Client Conference Minutes, Sec. 9-201. 1968 Doble Client Conference Minutes, Sec. 9-204. 1 (FIST 3-25 6/9) 1. Deenergize Power Line. 2. Without disconnecting Power Line, ground T1 using safety ground. 3. Close ground Switches S1 and S2 on the side of the device housing. 4. Disconnect B2 and B3 at Points \"X\" Inside the device housing. B2 and B3 may be found connected together, or B3 may be floating if the capacitor is used only with carrier equipment. B2 will be found grounded if the capacitor is used only with a potential device. 5. Test as follows:"
+      }
+    ]
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "Is it OK to pull the protective links out of a capacitor bank by hand?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"capacitor bank fuse links removal safety discharge grounding before handling\"\n}",
+    "result_summary": "5 passages: S1 p.103, S2 p.144, S3 p.181, S4 p.16-18, S5 p.144",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**No, not unless the bank has been disconnected, discharged and grounded first.** TM 5-684 says capacitor fuses should not be removed or replaced by hand unless the capacitors have already been discharged and grounded [S1].\n\n**What the manual requires:**\n- **Disconnect and ground the whole bank** while you replace fuses. The only exception is when you can take the fuse link or its mounting safely and completely out of the circuit using hot-line tools [S1].\n- **Wait, then short the terminals.** Capacitors stay charged after they are de-energized. Wait at least 5 minutes, then short the terminals to ground and to each other [S2], [S5].\n- **Don't trust the built-in discharge resistors.** Most capacitors have one, but the manual says not to rely on it alone for safety [S5].\n- **Keep the grounds on** until all work on the installation is finished [S5].\n\n**Related points:**\n- **Vented fuses:** If you're working inside the venting area, de-energize them before replacing them. If they can be operated from outside that area, hearing protection is recommended [S1].\n- **Fuses blowing for no clear reason:** This can point to a harmonic or resonance problem. Find the cause rather than just replacing the fuses [S3].\n\nThis guidance comes from a 1996 US Army manual. In Germany or the EU, follow your current national rules, such as DIN VDE 0105-100 / EN 50110 (the \"five safety rules\"), and your company's switching and grounding procedures."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-7. Fuse replacement.",
+        "pages": "103",
+        "text": ".- c. Replacing fuses on capacitor installations. Fuses used on capacitors should not be removed or replaced by hand, unless due precautions are taken beforehand to discharge and ground the capacitors in accordance with chapter 13, section II. The entire capacitor bank should be disconnected and grounded while replacing the fuses, unless the fuse link or its mounting, or both, can be removed safely and completely from the circuit using hot line tools. d. Replacing of vented fuses . Vented fuses being replaced within this venting area should be deenergized during replacement. Vented fuses, operable from outside their vented area, may be replaced without deenergizing the circuit, but the use of hearing protectors is recommended. e. Replacing of current-limiting nonvented type. Careless handling of these inherently fragile fuses may result in damage. When damage is suspected, the fuse should not be used. f. Expendable cap cutouts . Do not install a nonexpendable cap on an expendable cap cutout because of the resulting reduction of the expendable cap cutout’s interrupting capability."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "13-3. Application of power capacitors.",
+        "pages": "144",
+        "text": "Fixed shunt capacitors are used to improve the voltage level and switched shunt capacitors are used to improve voltage regulation. Capacitor installations will generally be connected grounded wye because of undesirable effects of other connections. All capacitor banks should be equipped with a means to disconnect them from the electric system. Some systems utilize ungrounded connections to minimize interference and because this connection is considered easy to fuse. Capacitors containing polychlorinated biphenyl (PCB) should have been disposed of under the procedures of the Environmental Protection Agency to implement the Toxic Substances Control Act of marked as containin g PCB’s. ANSI/IEEE 18 now requires an impregnant identification visible from the ground with a glue color used to designate a nonPCB liquid. Capacitors retain a charge after they ar e deenergized. After capacitors are deenergized allow at least 5 minutes for discharge and then short the capacitor terminals to ground and to each other. These grounding provisions should remain until work on the installation is completed."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "16-12. Electric power quality data.",
+        "pages": "181",
+        "text": "Verify that panelboard loads are balanced, where applicable, and check wiring and grounds. A majority of power quality problems result from loose connections and improper grounding techniques,and unbalanced loads. If correcting these deficiencies does not alleviate excessive harmonics, then harmonic mitigation measures must be developed utilizing engineering solutions beyond the scope of this manual. AIthough harmonic mitigation is not the responsibility of the electrical supervisor, it is the supervisor’s responsibility to kee p informed on both the quantity and quality of electrical service available to facility users. Therefore, an awareness of apparatus actions, which may indicate unacceptable harmonic levels, is necessary to determine where more precise data should be acquired. a. Capacitors .Capacitor impedance decreases with frequency, and a capacitor bank acts as a harmonic sink where most harmonic problems are first noticed. Fuse blowing, without any obvious reason, or a capacitor unit failure, can be signs of a possible harmonic problem. A supply system inductance, in resonance with the capacitor bank, can cause large currents and voltages to develop."
+      },
+      {
+        "id": "S4",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-22",
+        "pages": "16-18",
+        "text": "With reenergizing of the circuit a current path can easily be established over this short distance at 115-kV. A fuse conducting rod that fails to eject provides no protection whatsoever. The fuse is fitted with a disc over the bottom of the tube that is supposed to keep out dirt and presumably moisture, yet be fragile enough to allow ejecting of the conducting rod when the fuse link melts. However, in service these discs generally do not stay in place. They drop off within a relatively short time in most cases. It is recommended that fuses with similar operating mechanisms be thoroughly inspected on an annual basis with particular attention given to operability of fuse ejection features. (FIST 3-22 6/91) 2 Instrument Transformer Secondary Grounding ANSI C57.13.3 - Guide for the Grounding of Instru­ ment Transformer Secondary Circuits and Cases, contains the following important grounding require­ ments: should be connected to the station ground at only one point. This holds true regardless of the number of instrument transformer secondary windings con­ nected to the circuit."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section I-CONSIDERATIONS Section II-MAINTENANCE AND INSPECTION 13-5. Ensuring safe capacitor deenergizing.",
+        "pages": "144",
+        "text": "After capacitors are deenergized allow at least 5 minutes for discharge and then short the capacitor terminals to ground and to each other. These grounding provisions should remain until work on the installation is completed. Although most power capacitors have a discharge resistor installed to automatically discharge them after they are disconnected from the circuit, it is not advisable to depend entirely on such resistors for safety. The initial inspection should be made within 24 hours after energizing a new capacitor installation. This inspection should be made at a time of maximum circuit voltage, usually during the first period of light load on the circuit. In addition to visual observations, this inspection should include voltage and current readings to ensure that voltages and currents do not exceed capacitor rating limits. Operating kilovars (the sum of the fundamental frequency kilovars and any harmonic frequency kilovars) should not exceed 135 percent of the capacitor rating. Routine maintenance and inspection should be accomplished at least four times per year."
+      }
+    ]
+  }
+]

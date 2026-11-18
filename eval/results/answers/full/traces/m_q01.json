@@ -1,0 +1,103 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How should porcelain insulators be checked for cracks?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"porcelain insulator crack inspection\"\n}",
+    "result_summary": "5 passages: S1 p.22, S2 p.26, S3 p.22, S4 p.27, S5 p.63-64",
+    "is_error": false
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"testing insulators for cracked or defective units\"\n}",
+    "result_summary": "5 passages: S6 p.22, S7 p.115, S8 p.166-167, S9 p.83-84, S10 p.174",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "The manuals give two main ways to check porcelain insulators for cracks: a close visual inspection and a tap test, which may only be done when the equipment is de-energized.\n\n**1. Visual inspection**\n- Look for fractures, chips and buildup of dirt, salt, cement dust, acid fumes or other foreign matter. When wet, these can cause a flashover [S1].\n- On large porcelain units made of several cemented pieces, look closely near the cemented joints. Poor cementing can make the cement swell and crack the porcelain [S1].\n- On switch-and-bus insulators, cracks can come from heat movement between nested parts, which lets moisture in [S3].\n- Where a crack or chip is matters. A chipped skirt only affects performance if it noticeably shortens the creepage distance, which is the distance along the surface between conductors [S2].\n\n**2. Tap test (de-energized only)**\n- Tap each insulator gently with a small metal object about the size of a 6-inch (15 cm) wrench [S1].\n- A sound unit gives a ringing tone. A cracked one sounds dull and hollow [S1].\n- Tap, don't strike hard, or you can damage good insulators [S1].\n- The equipment must be de-energized unless the manual's authorized live-work procedure (chapter 4, section XV) applies [S3].\n\n**3. Supporting tests**\n- Defective insulators can cause visible corona or radio interference, which instruments can detect [S6].\n- At important substations, occasional power factor tests are used. Bus and switch insulators should be tested along with the other substation equipment [S6].\n\n**What to do with a defect**\n- If the main body of a pin-type or post insulator is cracked, replace it immediately [S1].\n- On bushings: if the main body is intact but a crack is about to break off a large skirt chip, protect the neighbouring skirts and remove the chip. Then smooth the edges and paint the exposed surface with weather-resistant material [S4].\n- Bureau of Reclamation guidance says to check bushings and insulators quarterly for chipped or broken porcelain [S5].\n\nThese are older US documents (US Army TM 5-684 from 1996, USBR FIST from 2005). If you work under EU or German rules, check current standards and your utility's own procedures. The manuals don't cover drone or image-based crack detection. Our YOLO detector only finds insulators, and any AI condition review is a second opinion that a qualified person has to confirm."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22",
+        "text": "The glossy surface of the glaze makes the insulator surface self-cleaning. Large porcelain insulators are made up of several shapes cemented together. A chemical reaction on the metal parts from improper cementing can result in a cement growth which can be sufficiently stressful to crack the porcelain. (b) Glas sinsulators..Glass insulators are made from a mixture of sand, soda ash, and lime which is mixed and melted in an oven, then molded, cooled, and annealed. (2) Inspection. (a) Look for fractures, chips, deposits of dirt, salt, cement dust, acid fumes, or foreign matter, which under moist conditions may cause a flashover. (b) Check f or cracks in insulators by tapping gently with a small metal object ONLY WHE N DEENERGIZED, about the size of a 6-inch (15 centimeter) wrench. Insulators free of cracks emit a ringing sound when tapped; cracked ones sound dull and hollow. To avoid damaging good insulators, tap them; do not hit them hard. (3) Repair. (a) If the main body of a pin type or post insulator is cracked, replace it immediately."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-33. Maintenance of bushings.",
+        "pages": "26",
+        "text": "Factors that may increase the frequency of maintenance and inspections include: (1) Construction, condition, age, and history of the bushing. (2) Conditions under which the bushing must operate. Bushings subject to excessive contamination or temperature should be inspected more frequently than those that operate under normal conditions. - (3) Relative importance of service continuity. (4) Accessibility. b. Visual inspection. Bushings should be visually inspected for evidence of any condition that will tend to (1) (2) (3) (4) (5) (6) (7) impair satisfactory performance, including: Excessive contamination. Cracked or broken porcelain. Low oil level (oil-filled bushings). Broken or deteriorated seals. Fractured metal parts. Excessive operating temperature. Loose or missing parts, such a sa power factor test tap cover. c. Porcelain inspection . When inspecting porcelain, the following procedure is recommended: (1) Fractures. Check for fractures and chips in porcelain. The significance of a crack or chip depends on its location and configuration, since a chipped skirt does not affect performance unless the effective creepage distance is appreciably reduced."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22",
+        "text": "This is because the several pieces of porcelain and hardware, assembled in a single unit, are usually located at key positions in the systems, where failure is extremely serious. Switch-and-bus insulator failures occur when porcelain is thrown in tension by any thermal movement between nested parts, which can cause cracking and allow the entrance of moisture. An accumulation of foreign deposits, and mechanical damage from external sources also cause deterioration. Evidence of such impairments may cause a flashover puncture accompanied by a destruction of insulator parts. Workers should be CAUTIONED that equipment must be de-energized unless the procedure in chapter 4, section XV is authorized. a. Ceramic insulators . Ceramic insulators are made of wet-process porcelain or toughened glass. (1) Construction. (a) Porcelain insulators. Porcelain insulators are manufactured from special clays to produce a plastic-like compound which is molded, oven dried, dipped in a colored glazing solution, and fired in a kiln. The glossy surface of the glaze makes the insulator surface self-cleaning. Large porcelain insulators are made up of several shapes cemented together."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-33. Maintenance of bushings.",
+        "pages": "27",
+        "text": "When the cause appears to be a too rigid connection, install a flexible connector or expansion joint made from a flat strap, in addition to replacing the bushing. (2) Chips. Whenthe main body of the porcelain is intact, but a crack is about to detach a large chip of skirt, protect adjacent skirt and remove the chip with a hammer. Smooth the sharp edges with an abrasive stone to prevent injury to workmen, and paint the exposed surfaces with a weather-resisting material to provide a glossy finish that keeps out dirt and grit. (3) Contamination.Remove deposits of foreign materials. Clean as recommended. (4) Tracking. W hen there is evidence of flashover, check the bushing voltage rating and surge protection. Clean the bushings. Bushings experiencing frequent flashovers should be reported to the operating department, as this may require a review of the application and associated surge. _ e. Metal parts inspection. Metal parts of bushings, including the mounting flange and hardware, should be inspected for fractures, cracks, blowholes in cap and assemblies, and a need for repainting."
+      },
+      {
+        "id": "S5",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix A AIR AND OIL CIRCUIT BREAKER PREVENTIVE MAINTENANCE",
+        "pages": "63-64",
+        "text": "Inspect underside of cover for moisture and rust, and clean and repaint as necessary. Check tank liners and interphase barriers. Oil Levels and Gauges Daily or Weekly – Check oil level in gauges of the tanks and oil-filled bushings. Replenish oil if below normal. • Clean dirty gauge glasses and connections into tank. Drain out and replace bushing oil if dirty or discolored. Breathers and Vents Daily or Weekly – Check for external obstructions to breakers and vents. • Check to see that screens and baffles in vents or breathers are not obstructed or broken. Panels and Cabinets • Check air circuit breaker or other panels of insulation material for cracks and cleanliness. Check condition of enclosing cabinets including hinges, latches, locks, door gaskets, and paint. Bushings or Insulators Quarterly – Check for chipped or broken porcelain, excessive dirt film, oil level and oil or compound leaks. • Clean porcelain with water, liquid turtle wax, or other suitable cleaner. Repair chipped spots by painting with lacquer such as 1201 glyptal. Inspect gaskets for leaks. Tighten bolts."
+      },
+      {
+        "id": "S6",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section IV - INSULATORS 3-19. Function of insulators.",
+        "pages": "22",
+        "text": "Defective insulators can also cause visible corona or interference voltage propagation. b. Related material . Apparatus type insulators are provided in substations to support devices and heavy lines. See chapter 4, section XII, which provides a discussion of insulation levels. Radio interference conditions may be detected by using instruments designed for this purpose. Otherwise, maintenance tests on insulators are normally limited to occasional power factor measurements at the more important installations, where the loss of the facilities must be kept to an absolute minimum. Bus and switch insulators should be power-factor tested in conjunction with similar testing of other apparatus within the substation. Power factor tests are described in section VII. Switch-and-bus apparatus type insulators are the most intricate type and require the highest degree of reliability in service. This is because the several pieces of porcelain and hardware, assembled in a single unit, are usually located at key positions in the systems, where failure is extremely serious."
+      },
+      {
+        "id": "S7",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-19. Automatic circuit reclosers.",
+        "pages": "115",
+        "text": "Field inspection. After installation, a recloser should be carefully inspected at the established interval. An inspection should include examining the bushings for cracks, as well as other items recommended by the manufacturer. Inspect oil-insulated unit tanks for leakage. Record the counter reading. Bypass and isolate the recloser by suitable means, if possible, and perform an operating test. Manually operate the recloser several times to the lockout position, by means of a switch stick or other control. Operating tests can disclose possible troubles and do prevent the accumulation of high-resistance oxides on contact surfaces. -_ d. Maintenance. Give the following items particular attention: (1) Oil-insulated unites . Never assume that new oil is free of moisture. It should be tested for dielectric strength before using, with breakdown across a standard O.l-inc h (2.54-millimeter) gap occurring at not less than 26 kilovolts root mean square (rms), the minimum acceptable dielectric strength for new oil. Breakdown at a lower test voltage usually indicates excessive moisture in the oil. Remove any moisture by filtering before the oil is used."
+      },
+      {
+        "id": "S8",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section III-PROTECTIVE EQUIPMENT 15-9. Protective electrical rubber goods.",
+        "pages": "166-167",
+        "text": "The Lineman’s and Cableman’s Handbook covers the procedure and shows the complexity and expertise required for in-service testing of rubber goods. (2) Line hose. The outside of line hose should be inspected for checks and cracks by bending the hose 180 degrees. at successive points along its length to stretch the rubber enough to expose possible defects. The inside of line hose is inspected by opening and spreading. Periodic electrical in-service tests should be given in accordance with ASTM F 478 which also covers in-service care. (3) Other equipment.All other rubber protective equipment should be inspected for cuts, tears, --. snags, or other defects that could impair safety. Rubber blankets are inspected by placing them on a flat surface, rolling each corner diagonally, and checking the outer surface as it is rolled. Insulator hoods are spread open at the bottom just enough to permit a view of the inner surface. Attempting to force the sides back to any great extent should be avoided, since this causes cracks or splits the hood."
+      },
+      {
+        "id": "S9",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "5-29. Cable power factor tests.",
+        "pages": "83-84",
+        "text": "Thus, the ability ‘C POWER FACTOR= WATTS . ” R VOLTAMPERES = VI, = COSINE ++ Figure 5-3. Insulation power factor equivalent circuit and vector diagram toodetect a localized fault diminishes ofthe cable under test increases. as the length c. Effectiveness of power factor tests. Power factor tests can be effective in detecting defective insulation for short cable runs which are common in electrical substations and industrial complexes, and for indicating general deterioration and/or contamination of longer lengths of cable insulation runs. This test can be performed at any voltage that does not exceed the line-to-ground voltage rating of the cable. In addition to checking cable insulation, this test can be used to find: (1) Any defects in the shield circuit which can lead to localized problems. The measurements should be performed on each end of the cable. The theshield should be grounded for the test only end where the test connections are made. at Anincrease in power factor can indicate discontinuities or breaks in the shield."
+      },
+      {
+        "id": "S10",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section VIII-LARGE PORTABL E AND MOBILE EQUIPMENT",
+        "pages": "174",
+        "text": "The basic dielectric elements are: upper boom; basket liner and basket; lower boom insulator; and hydraulic lines and fluid, and leveling insulators. The different levels of periodic electrical test values and methods should conform to ANSI/SIA A92.2. For the Air Force, provide dielectric testing in accordance with AFTO 36C-1-4. (2) Boom cleaning. If high leakage currents are revealed during periodic high-voltage testing, the boom should be thoroughly cleaned both inside and outside and provided with silicone replacement in accordance with the manufacturer’s recommendations. Materials used in cleaning and coating must be approved by the equipment manufacturer. The boom should then be retested. (3) Mechanical and other tests and inspections. These should be applied to the aerial device over its life to ensure continuing OSHA conformance. (a) Visually inspect welds. Us e liquidpenetrant and magnetic-particle testing to detect workmanship defects, or defects where overstressing or fatigue is suspected. Doubtful welds should also be x-rayed. (b) Visually inspect fiberglass for structural and surface damage. Use strain-gage testers, dye and light-penetrant testing, or X-ray testing as appropriate to suspected damage."
+      }
+    ]
+  }
+]

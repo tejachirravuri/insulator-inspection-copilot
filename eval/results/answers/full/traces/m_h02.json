@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What can happen when a faulty capacitor used for line communication is left in service?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"faulty coupling capacitor power line carrier left in service failure\"\n}",
+    "result_summary": "5 passages: S1 p.22-24, S2 p.24, S3 p.25-27, S4 p.30-31, S5 p.136",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "According to the Reclamation manuals, a defective **coupling capacitor** (the capacitor that links power-line carrier communication equipment to the transmission line) can **explode**. That puts nearby people at risk of injury and also hurts the communication link:\n\n- **Explosion and personnel hazard:** \"Experience has proven that coupling capacitors will explode when they become defective.\" Because of the injury risk, testing them is treated as a necessity [S1].\n- **Poor carrier performance:** A defective unit also degrades the carrier (communication) signal it is there to pass [S1]. Coupling capacitor voltage transformers (CCVTs) pass communication and relaying signals while blocking power-frequency energy, so protective relaying that depends on them can be affected too [S4].\n- **Catastrophic failure if testing is skipped:** CCVTs are usually oil-filled and \"subject to catastrophic explosive failure when not tested on schedule\" [S4].\n\n**How the manuals say to prevent this:**\n- Do Doble power-factor tests on the capacitor units. Compare the results with nameplate or earlier test data, and use the same test procedure each time so the numbers can be compared [S1][S2].\n- Check for oil leaks and do infrared scans. All maintenance except infrared scanning must be done with the equipment de-energized [S4].\n\nThese are older US manuals (FIST 3-25 dates from 1991 and FIST 4-1B from 2005). For current test intervals and acceptance criteria, check the manufacturer's data and the standards that apply to you, such as IEC/DIN EN for coupling capacitors and CCVTs."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "6. Local electrical codes require three overload",
+        "pages": "22-24",
+        "text": "In (a), line currentreadings are taken of each phase. In (b) and (c) motor terminal connections have been rotated in a manner that motor direction of rotation remains un­ changed. In (b), the same readings pre­ vail as were read for the test connection in (a), indicating that the problem is caused by unbalanced line voltages. In (c), the highest-reading phase has shifted, indicating that the problem is in the motor connections or the motor. OCTOBER 14, 1971 • PLANT ENGINEERING • 99 3 (FIST 3-24 6/91) CAPACITORS Doble Testing Of Coupling Capacitors (Test procedure of TVA modified for Reclamation use) Experience has proven that coupling capacitors will explode when they become defective. Because of the possibility of injury to personnel and poor carrier performance when coupling capacitors become de­ fective, the testing of coupling capacitors is a necessity. This chapter is provided to serve as a guide in making coupling capacitor tests by a Doble power factor test set. Figure 1 shows a typical coupling capacitor installation."
+      },
+      {
+        "id": "S2",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "24",
+        "text": "This chapter is provided to serve as a guide in making coupling capacitor tests by a Doble power factor test set. Figure 1 shows a typical coupling capacitor installation. Note that an installation generally consists of the porcelain-clad capacitor unit(s) and a base housing carrier-current and/or potential-device networks. If field test results are to be compared with nameplate or earlier field data, test procedures must be consistent. Also, knowledge of the carrier and potential-device networks is necessary in order that they be properly grounded or disconnected to eliminate any effect they might have on the measurement. The test procedure outlined under Figure 1 is designed to produce the data required for individual units with a minimum of disconnection, while enhancing safety and reducing the effects of electrostatic interference. Test data should be recorded on the Doble \"Miscel­ laneous Equipment\" form. The report form should include complete information regarding the capacitor manufacturer, type, rating, serial number, and nameplate data (capacitance and power factor)."
+      },
+      {
+        "id": "S3",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "25-27",
+        "text": "B2 will be found grounded if the capacitor is used only with a potential device. 5. Test as follows: To Measure Energize Ground Guard UST C(T2-T1) B1 =T2 T1 B3 ** - C(B1-B3) B1 = T2 T1 - B3 C(B1-B2) B1 =T2 T1 - B2 C(B3-B2) B3 * T1 - B2 *Test voltage not to exceed rating of Tap or Auxiliary Capacitor. **To make certain that all the current in the parallel circuit will be subtracted from the meter reading, vary the procedure slightly in that after applying the safety ground and closing the ground switches, disconnect the capacitor from the power line and test C(T2-T1) by energizing T2 and UST T1. (FIST 3-25 6/91) 2 Failures of Pedestal-type (Pin and Cap) Insulators The problem of failure of pedestal-type insulators first appeared on a 34.5-kV bus at a Reclamation substation in 1962. Since that time, similar failures have occurred on 12.47-kV, 34.5-kV, 41.8-kV, and 69­ kV bus Installations at many other locations."
+      },
+      {
+        "id": "S4",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "8. Potheads and Stress Cones 8.1 General",
+        "pages": "30-31",
+        "text": "Potheads and stress cones provide mechanical support and electrical insulation for cables. Insulating capability of these devices is important to prevent a fault and resulting forced outage. Visual inspection for leaks, cracks Annually NFPA 70B, 10.2.4 Annex H.2 Doble AC loss measurement (hot collar) or DC ramp with cable 3-6 years FIST Volume 3-1 Doble Reference Book on Cables and Accessories Visual inspection and infrared scan, while loaded Annually NFPA 70B, 20.17 Coupling capacitor/voltage transformers (CCVTs) are instrument transformers which provide a path for communications (traveling over the transmission line) to reach communication and relaying equipment without allowing power system frequency energy to pass. These are static devices requiring relatively little maintenance. Except for infrared scanning, maintenance must be conducted with equipment de-energized. This equipment normally is oil-filled and must be checked for oil leaks. It is subject to catastrophic explosive failure when not tested on schedule."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "2. Grease or oil on brake wheel",
+        "pages": "136",
+        "text": "See noisy magnet. Install surge tank. Worn part s Replace worn parts. No voltage on motor Check circuit and connections. Misapplication Get manufacturer’s recommendations. Mechanical binding Clean and adjust. Temperature too far above normal Replace bellows. Liquid frozen in capillary tube, or tube Replace bulb and bellows assembly. stopped up , RESISTORS: Insulation failure 1. Overheating 1. 2. 3. Open circuit 1. 2. 3. RECTIFIERS-DIODES: Dry type, overheating 1. 2. See insulation failure Rating too low Running on starting resistor Restricted ventilation Burned out from overheating Corrosion, moisture, acid fumes, Mechanical damage See insulation failure. Install larger resistor. Check the timer to make sure it operates. Relocate. Replace resistor and see above. Relocate or correct atmospheric conditions. Replace worn or broken parts. Overvoltage Correct system voltage. Overcurrent, intermittent-rated unit left Check operation of circuit and application. Failure burnout or breakdown CAPACITORS: Breakdown or failure of dielectric FUSES: Premature blowing 1. Fuse too small Check application. on continously 1. Overheating, corrosive atmosphere, overvoltage, mechanical damage lightning 4. Moisture, corrosion, or high temperature. . unit Course of action Remove grease or oil."
+      }
+    ]
+  }
+]

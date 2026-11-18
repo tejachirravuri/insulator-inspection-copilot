@@ -1,0 +1,25 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "In inspection 15, how many detections did the vision review judge not to be insulators?"
+  },
+  {
+    "role": "tool_call",
+    "name": "get_inspection",
+    "content": "{\n  \"image_id\": 15\n}",
+    "result_summary": "image 15: 4 detections",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**3 of the 4 detections** in inspection 15 were marked as not insulators by the AI vision review (`is_insulator: false`):\n\n- **#36** (confidence 0.36): condition \"not_an_insulator\". The crop looks like light-coloured leaves or flowers against a dark green background.\n- **#38** (confidence 0.27): condition \"not_an_insulator\". The crop shows tree leaves and branches against the sky.\n- **#37** (confidence 0.36): `is_insulator: false`, but its condition is \"unclear\", not \"not_an_insulator\". The crop is very small and blurry and could be plants or hardware. The review couldn't confirm an insulator, but it didn't clearly rule one out either.\n\nThe only remaining detection, **#35** (0.40), was judged a possible insulator. Its condition is \"unclear\" because the image is too low-resolution to judge.\n\n**Notes:**\n- All four detections are flagged for human review, so a qualified inspector needs to confirm these calls. They are an AI second opinion, not a final answer.\n- The confidence scores are low (0.27–0.40), and the auto mode switched up to the accurate YOLOv8s model for this glass-insulator image. This suggests the image is hard to read, possibly because the insulators are small or far away. If the site matters, a closer or higher-resolution photo would help."
+  },
+  {
+    "role": "sources",
+    "content": []
+  }
+]

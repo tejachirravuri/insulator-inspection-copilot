@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What problems did the Trinity Plants have with their mercury switches?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"Trinity Plants mercury switches problems\"\n}",
+    "result_summary": "5 passages: S1 p.6, S2 p.4-6, S3 p.6, S4 p.181-182, S5 p.6-8",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "At the Trinity Plants, mercury switches falsely operated because of vibration. For about the first two years, this caused the generating units to trip off or lock out [S1].\n\n**What went wrong**\n- The false operations affected the thrust bearing and turbine bearing oil-level switches, the thrust and lower guide bearing oil-temperature switches, and sometimes others [S1].\n- The switches were mounted almost flat. Heavy vibration made the mercury splash and briefly close the contacts [S1][S3].\n- Vibration was worst when the units were synchronized onto the line and when they ran through rough loading ranges [S1].\n- Lewiston Construction Office staff first saw the problem before the plants were handed over to operation and maintenance [S1].\n\n**How it was fixed**\n- **Rough synchronizing:** solved by properly adjusting the automatic synchronizer [S3].\n- **Thrust bearing oil high/low level interlocks:** these caused the most false trips, so they were replaced with anti-vibration mercury switches on each generator. These worked well after a small adjustment to the slope of the mercury tube [S3].\n- **The other switches:** some were moved to spots with less vibration, and the mountings were adjusted to tilt the mercury tube more steeply so the mercury couldn't splash. None of these had to be replaced with anti-vibration switches [S3].\n\nSource: USBR FIST Volume 3-19 (6/91). This is an older US Bureau of Reclamation document about a specific plant, not a general standard."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-19 CORRECTION FOR FAULTY OPERATION OF MERCURY SWITCHES",
+        "pages": "6",
+        "text": "Correction for Faulty Operation of Mercury Switches For approximately the first two years of operation of the Trinity Plants, problems were experienced with the units tripping off or locking out due to false operation of the mercury switches. This trouble was first experienced by the Lewiston Construction Office personnel before these plants were transferred to operation and maintenance status. Investigation of this repetitive problem disclosed that operation of these mercury switches (thrust bearing oil level-, turbine bearing oil level, thrust and lower guide bearing oil temperature switches, and occasionally others) was initiated by vibration. This vibration was greatest as the units were synchro­ nized on the line and as the units passed through rough loading ranges. The troubles initiated by rough synchronizing were corrected by proper ad­ justment of the automatic synchronizer. It was found that the mercury switches were mounted practically flat and heavy vibration caused the mercury to splash, momentarily closing the con­ tacts."
+      },
+      {
+        "id": "S2",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-18 REPLACING GLAZE BURNED INSULATORS",
+        "pages": "4-6",
+        "text": "However, it is recommended that insulators with such burns be replaced, when convenient, in order to eliminate all doubt. A record should be kept of the location and extent of all flashovers. High-voltage equipment bushings, which do not depend on the bulk porcelain for insulation strength, can be retained in service with small chips or glaze burns provided no more than one skirt is damaged, and there is no evidence of cracks in the main porcelain shell. Such damaged areas, are usually cleaned and painted with glyptal. Since a glyptal finish tends to crack after a prolonged exposure to the elements, epoxy materials have been used for this purpose, or as an adhesive to replace a piece which has broken off. 1 (FIST 3-18 6/91) Correction for Faulty Operation of Mercury Switches For approximately the first two years of operation of the Trinity Plants, problems were experienced with the units tripping off or locking out due to false operation of the mercury switches."
+      },
+      {
+        "id": "S3",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-19 CORRECTION FOR FAULTY OPERATION OF MERCURY SWITCHES",
+        "pages": "6",
+        "text": "The troubles initiated by rough synchronizing were corrected by proper ad­ justment of the automatic synchronizer. It was found that the mercury switches were mounted practically flat and heavy vibration caused the mercury to splash, momentarily closing the con­ tacts. Anti-vibration type mercury switches were purchased by the Lewiston Office for the thrust bearing oil high and low level interlocks on each generator as these were the switches that had caused the greatest number of false operations. The antivibration mercury switches have been very satisfactory after minor adjustment on the slope of the mercury tube. False operation of the remaining mercury switches has been corrected by relocating some of the switches to locations where they are subject to less vibration and by adjusting the mounting to increase the slope of the mercury tube to prevent the mercury from splashing. Therefore, it has not been necessary to replace any of the remaining mercury switches with the anti-vibration type. 1 (FIST 3-19 6/91)"
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "16-13. Electrical distribution system interference.",
+        "pages": "181-182",
+        "text": "Circuit breakers interrupt current flow at zero current and a current wave with zeros at locations other than on the fundamental sine wave can cause circuit breakers to have premature interruption and restrike. Circuit breaker blowout coils can fail to interrupt currents. Loadbreak switches, fuses, and other switching devices can be subject to the same problems. g. Miscellaneous. Equipment not normally part of exterior electric facilities can be affected by harmonics in the following ways: ( 1) Electronic equipment. Electronic equipment is not only a source of harmonic currents, but is prone to misoperation if not operated on its correct voltage and current waveforms. (2) Rotating equipment. Rotating machinery will see increased losses, possible reduction in available torque, and (conceivably) mechanical oscillations in prime mover/generator and motor/load combinations. (3) Incandescent lamps are the most sensitive to increased heating effect, which can significantly shorten lamp Life. Gaseous discharge lighting, such as high-intensity discharge and fluorescent lamps, can produce harmonics from solid-state ballast components. 32-1082MO-200/AFJMANTM 5-684/NAVFAC 17-1. Maintenance planning. 17-2. Maintenance priorities. Proper maintenance depends on realistic planning."
+      },
+      {
+        "id": "S5",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-19 CORRECTION FOR FAULTY OPERATION OF MERCURY SWITCHES",
+        "pages": "6-8",
+        "text": "Therefore, it has not been necessary to replace any of the remaining mercury switches with the anti-vibration type. 1 (FIST 3-19 6/91) General Guide for Checkout of New Electrical Facilities The following list is to be used as a general guide for less of type and use. O&M checkout of new facilities, and should be followed to the extent practical prior to placing the 10. Doble test all power transformers, circuit breakers, facilities in commercial operation. instrument transformers, lightning arresters, coupling capacitors, bushings, etc. These initial test results will 1. Schematic diagrams are to be checked for errors. be used as reference points for evaluation of future Special consideration must be given to schematic tests. diagrams for differential relaying current circuits and for ground relay polarizing circuits since errors are 11. Make physical oil and dissolved gas-in-oil tests most frequently found in these circuits. (where applicable) for oil filled equipment. These tests results will also be used as references for judging 2. All detail wiring diagrams should be checked results of future tests. against the schematic wiring diagrams. 12."
+      }
+    ]
+  }
+]

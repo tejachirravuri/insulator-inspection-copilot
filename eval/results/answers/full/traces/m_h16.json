@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How can a lineworker check protective hand wear for holes before use?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"rubber gloves inspection before use air test holes\"\n}",
+    "result_summary": "5 passages: S1 p.166, S2 p.166, S3 p.167, S4 p.167, S5 p.167",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "Use the **air test plus a visual inspection** before every use [S1]:\n\n1. **Trap air:** Hold the cuff at opposite points and twirl the glove so air gets trapped inside [S1].\n2. **Seal it:** Hold the cuff closed with one hand so the air can't get out [S1].\n3. **Squeeze:** With your other hand, push the air into the thumb, fingers and palm. Listen and feel for any air escaping, which means there's a hole [S1].\n4. **Look at both sides:** Check the outside, then turn the glove inside out and check the inside [S1]. Look for embedded foreign material, cuts, deep scratches or punctures [S1].\n5. **Bad gloves:** Tag any defective glove and turn it in for replacement [S2].\n\n**Also:**\n- The air test doesn't replace the periodic electrical proof test. That test is best done by a utility or an independent lab, or per ASTM F 496 [S2].\n- Gloves taken out of storage need a full visual inspection and an electrical test before use [S4].\n- Store gloves in individual bags and in their original containers. Never leave them inside out, because the stretching speeds up deterioration [S3][S5].\n\nThis comes from a 1996 US Army manual (TM 5-684). If you work in the EU or Germany, check your current requirements, such as EN/IEC 60903 for insulating gloves and your employer's safety rules."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section III-PROTECTIVE EQUIPMENT 15-9. Protective electrical rubber goods.",
+        "pages": "166",
+        "text": "Inspection. Rubber protective equipment must be visually inspected prior to each use and should be given electrical and mechanical tests at the frequencies stipulated in departmental publications. Unserviceable rubber goods should be plainly marked and turned in for replacement. Familiarity with the visual inspection methods and techniques listed in ASTM F 1236 is advisable. (1) Rubber gloves and sleeves . Rubber gloves and sleeves should be inspected on the outside and then turned inside out for inspection on the reverse side. They must be free of defects or damage impairing electrical or mechanical properties, and must meet test requirements. (a) Air test and inspection for rubber gloves. Rubber gloves should be tested prior to each use. Grasp the cuff at opposite points and twirl the glove, trapping air inside. Hold the end closed with one hand so that air cannot escape. Then squeeze the glove with the other hand to force air into the thumb, fingers, and palm. Listen and feel for escaping air. Inspect the entire glove surface fo r imbedded foreign material, cuts, deep scratches, or punctures."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section III-PROTECTIVE EQUIPMENT 15-9. Protective electrical rubber goods.",
+        "pages": "166",
+        "text": "Then squeeze the glove with the other hand to force air into the thumb, fingers, and palm. Listen and feel for escaping air. Inspect the entire glove surface fo r imbedded foreign material, cuts, deep scratches, or punctures. Gloves found to be defective should be tagged and turned in for replacement. - (b) Electrical test for rubber sleeves and gloves. Rubber gloves and sleeves in service should be given an electrical proof test periodically. If possible, the test should be accomplished by a local utility company or an independent testing laboratory, who should also provide electrical testing for all other rubber goods used. If independent testing is not possible, then test equipment and test voltage should comply with ASTM F 496, which also covers in-service care. The Lineman’s and Cableman’s Handbook covers the procedure and shows the complexity and expertise required for in-service testing of rubber goods. (2) Line hose."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section III-PROTECTIVE EQUIPMENT 15-9. Protective electrical rubber goods.",
+        "pages": "167",
+        "text": "Insulator hoods are spread open at the bottom just enough to permit a view of the inner surface. Attempting to force the sides back to any great extent should be avoided, since this causes cracks or splits the hood. These inspections will be made, even if equipment has not been used since the last inspection. Periodic electrical testing of other rubber protective equipment should be conducted to ensure their adequacy as insulators. In-service care and testing is covered for line covers (hoods) in ASTM F 478 and for insulating blankets in ASTM F 479. There is no industry in-service care provision for matting, which is designed to meet ASTM D 178. b. Storage. The following procedures govern storage of rubber protective equipment: (1) Storage of equipment in line trucks . Store rubber protective equipment in readily accessible compartments and in an efficient manner. Gloves should be stored in individual bags and covers should be nested to conserve space. Permit no other equipment in compartments in which rubber goods are stored. (a) Provide separate compartments for each class of equipment."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section III-PROTECTIVE EQUIPMENT 15-9. Protective electrical rubber goods.",
+        "pages": "167",
+        "text": "Store gloves, coats, and hoods in original containers. Blankets and line hose should lie flat. (d) Do not store any tools or other material in the same bins with rubber protective equipment. (e) Give all rubber protective equipment in storage a thorough visual inspection and an electrical test before using. Protective hats shall be in accordance with the provisions of ANSI 289.1, Class B requirements (meetings a 20,000 volts ac test for 3 minutes) and shall be worn at the job-site by all workers who are exposed to potential hazards, such as falling objects, electric shock, or burns. Barriers are required adjacent to electrical installations for the protection of equipment and personnel. Permanent installations are normally protected by metal fences, however materials should be available for erection of suitable temporary barriers. a. Preformed barriers .Preformed barriers are available that are portable and readily assembled. Maintenance consists essentially of rust prevention by periodic painting. b. Temporary barriers . A temporary barrier can be constructed using hazard area warning tape in conjunction with stanchions."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section III-PROTECTIVE EQUIPMENT 15-9. Protective electrical rubber goods.",
+        "pages": "167",
+        "text": "Do not fold. (2) Warehouse storage . All rubber protective materials not stored on the truck should be stored in a warehouse, in a clean, cool, dark, place having an approximately 50 percent relative humidity. Since heat, light, oil, and distortion are natural enemies of rubber, protective equipment should be guarded against these dangers as much as possible. (a) Do not store rubber equipment near boiler rooms, steam pipes, or radiators. Protect it against exposure to direct sunlight. (b) Rubber ages or oxidizes quickest at points held under distortion. A blanket allowed to remain folded for a period of time cracks o r puncTM 5-684/NAVFAC MO-200/AFJMAN 32-1082 tures in the crease. Never leave rubber gloves inside out because distention at fingertips and glove body connections to finger and thumb pieces hastens deterioration. (c) Provide separate bins in the warehouse to store each class of equipment. Store gloves, coats, and hoods in original containers. Blankets and line hose should lie flat. (d) Do not store any tools or other material in the same bins with rubber protective equipment."
+      }
+    ]
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How often does the German transmission operator Amprion wash its insulators?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"insulator washing frequency interval\"\n}",
+    "result_summary": "5 passages: S1 p.66, S2 p.115, S3 p.23, S4 p.65-66, S5 p.45",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "I can't answer that from my sources. My knowledge base has only older US federal manuals (US Army TM 5-684 from 1996 and US Bureau of Reclamation FIST volumes from 2000–2005). None of them mention Amprion or other German or EU utilities. For Amprion's actual practice, you'd need Amprion itself, its published maintenance or grid documentation, or the relevant DIN EN / IEC and VDE guidance.\n\n**What the US manuals say about how often to wash insulators:**\n- **No fixed interval.** Wash often enough that dirt never builds up past the safe limit. Going past that limit can cause a flashover (an arc across the insulator) during live-line washing [S1].\n- **Each site sets its own schedule.** It depends on voltage level, the type of contamination and the equipment available, and the manual recommends asking the local utility how it washes energized insulators [S1][S4]. ANSI/IEEE 957 is the reference for the details [S1][S4].\n- **Contamination drives frequency.** Washing is needed more often near steel mills, cement and chemical plants, and on coasts with salt build-up. In bad conditions, special long-leakage insulators still need washing as often as standard ones. Coating porcelain insulators with silicone grease can stretch the time between cleanings [S3].\n- **Methods:** high-, medium- or low-pressure water, compressed air with dry abrasive cleaning compounds, or wiping by hand with tools on insulated poles [S1].\n\nTreat this as general background only, not a description of how German transmission operators work."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-65. Live-line operations.",
+        "pages": "66",
+        "text": "(1) Facility procedures. Each facility should develop procedures based on their level of voltages, contaminants, and available equipment. Using advice from the local utility concerning their energized insulator washing practices is recommended. (2) Energized cleaning methods. Energized cleaning methods include the use of high pressure, medium-pressure,and low-pressure water; compressed air with abrasive dry cleaning compounds; and wiping with burlap cleaning hammocks using hot sticks. All of these procedures are covered in ANSI/IEEE 957. (3) Technical considerations of pressurized water cleaning. Certain items influence the effectiveness of pressurized water cleaning performance and the leakage current that can pass to the operator’s body from the water stream. These items are the nozzle conductor distance, the water’s resistivity, the water pressure, and the nozzle-orifice diameter. Wind can interfere with the efficiency of the water spray. The washing interval must be such as to avoid flashover accidents during hot-line washing, which can occur when the acceptable limit of contamination has been exceeded. Some points, covered in more detail in ANSI/IEEE 957, are as follows: (a) Water resistiuity ."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-19. Automatic circuit reclosers.",
+        "pages": "115",
+        "text": "(2) Maintenance based on number of operations. Reclosers may be maintained after a certain number of operations, determined from the recloser operation counter readings. A procedure for evaluating useful life of an oil-filled recloser, based on standard duty, is given in ANS I C37.61/IEEE 321, appendix B but is not recommended for use by maintenance personnel. - (3) Maintenanceebased on elapsed time and number of operations. The use of time interval alone does not take into account the frequency and severity of the recloser operations. On the other hand, use of the number of operations alone ignores elapsed time, during which the insulating medium may have deteriorated. (4) Suggested frequency. An industry-suggested method of combining the elapsed time and operation factors is as follows: Maintenance, internal inspection, and testing of reclosers should be performed at 100 operations or every 3 years, whichever occurs first if no better basis can be established. c. Field inspection. After installation, a recloser should be carefully inspected at the established interval."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-22. Cleaning of insulators.",
+        "pages": "23",
+        "text": "(1) Inspection. Look for fractures and any rust. (2) Repair insulators having defective hardware. a. Causes of contamination . All insulators and also bushings are designed to permit satisfactory operation with some contamination. However, alternate wetting by early morning mist and fog, followed by exposure to dust and wind, can build up harmful deposits. Special contamination problems are encountered near steel mills, cement and chemical plants, and other factories that saturate the air with finely divided, semi-conductive particles. Along coastal areas, salt deposits build up and materially reduce the flashover value. Many of these deposits are extremely tenacious, requiring that the insulator be removed from service and cleaned by hand. Where contamination is serious, specia l longleakage suspension insulators for high-voltage lines have been used; but, where severe deposits occur, washing of special insulators is required as often as for standard insulators. To lengthen maintenance intervals, in areas where contamination is severe, ceramic insulators and bushings may be coated with special silicone greases."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-65. Live-line operations.",
+        "pages": "65-66",
+        "text": "(2) Insulators. The usual procedures in the replacement of insulators are as follows: - (a) Fasten the wire tongs to the conductor. (b) Remove the tie or clamp from the conductor. (c) Move the conductor clear of the work area and secure the wire tong. (d) Remove old insulator. (e) Mount new insulator. (f) Return conductor to insulator. (g) Tie or clamp conductor to insulator. (h) Remove wire tongs. (3) Crossarms: In replacing crossarms, apply steps (a), (b), an d (c) for all lines . Then remove crossarm and insulators and replace with ne w crossarm with new insulators in place. Then apply steps (f), (g), and (h). d. Washing energized insulators . Hand cleaning of de-energized insulators is described in chapter 3, section IV ANSI/IEEE 957 provides a guide for cleaning insulators. (1) Facility procedures. Each facility should develop procedures based on their level of voltages, contaminants, and available equipment. Using advice from the local utility concerning their energized insulator washing practices is recommended. (2) Energized cleaning methods."
+      },
+      {
+        "id": "S5",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "21.2 References and Standards",
+        "pages": "45",
+        "text": "• IEEE Std. 95-1997, Recommended Practice for Insulation Testing of Large AC Rotating Machinery with High Direct Voltage • IEEE Std. 43-2000, Recommended Practice for Testing Insulation Resistance of Rotating Machinery • Conditions Rating Procedures/Condition Indicator for Hydropower Equipment, U.S. Army Corps of Engineers • Handbook to Assess the Insulation Condition of Large Rotating Machines, Volume 16, Electric Power Research Institute • Electric Generators, Power Plant Electrical Reference Series, Volume 1, EPRI • Inspection of Large Synchronous Machines, I. Kerszenbaum • Test Procedure for Synchronous Machines, IEEE 115-1983 • Guide for Operation and Maintenance of Hydrogenerators, IEEE Std. 4921974 Note: See Appendix B in this document. Maintenance or Test Recommended Interval Preventive maintenance and inspections No standard recommended interval. Machine specific PM according to site operating conditions. Also, see Appendix B. Stator winding - physical inspection During 1-, 2½-, and 5-year warranty inspections; thereafter, during major maintenance outages but not to exceed 5 years. Stator winding - high voltage DC ramp test 3 to 5 years and after prolonged maintenance outage."
+      }
+    ]
+  }
+]

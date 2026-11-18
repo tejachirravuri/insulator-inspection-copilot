@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What minimum clearance does DIN EN 50341 require between a 110 kV conductor and the ground?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"minimum clearance conductor to ground 110 kV\"\n}",
+    "result_summary": "5 passages: S1 p.61-62, S2 p.25-27, S3 p.118-119, S4 p.48, S5 p.48",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "I can't answer this from my sources. The knowledge base only has older US federal manuals (US Army TM 5-684 from 1996 and the US Bureau of Reclamation FIST volumes from 2000–2005). It doesn't include DIN EN 50341 or any other European or German standard. I won't guess a number, because a wrong clearance value is a safety risk.\n\n**What the manuals do say:**\n- TM 5-684 says minimum conductor clearances are set in the US National Electrical Safety Code (NESC), not in the manual itself [S4]. The NESC is a US code and doesn't replace DIN EN 50341.\n- The only clearance figures in the manual are for tree trimming near lines up to about 40 kV, not for conductor-to-ground clearance at 110 kV [S1].\n\n**Where to find the correct value:**\n- **DIN EN 50341-1** (general requirements for overhead lines above 1 kV AC), together with the German national annex **DIN EN 50341-2-4 (VDE 0210-2-4)**. The required ground clearance depends on the voltage, the type of terrain or crossing, and the sag conditions the line is designed for (such as maximum conductor temperature or ice load).\n- Your utility's internal design and inspection rules, or the line's design documents, which will show the clearance that applies to that span.\n\nGet the binding value from the current standard text or from your grid operator's specialist for overhead line design."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-24. These distances may be increased as desired.",
+        "pages": "61-62",
+        "text": "Note that distances A and B are measured from the normal sagged position of the conductor, and that distance C, D, and E must be increased by the sag at that point. For tree trimming purposes, th e 30inch (750-millimeter) climbing space dimensions shown in figure 4-l should be increased to 40 inches (1,000 millimeters), and distances in figure 4-24 should be increased as required to maintain a 40-inch (l,000-millimeter) minimum climbing space. 0 to 750 lo 750 v 8700 V 13.2 Phase ond I32 lo 40 KVNeutrol 311(0.9m) Sft( 1.5m) 811(2.5m) lSft(1.5m) lOft(3m) AVOIO SAG Of LINE PLUS . .C UUN lRUNU 211(0.6m) 211(0.6m) 6ft( 1.h) ‘0’ UAIN LIUB 411(1.2m) 4ft(1.2m) 7ft(2.1 m) . .E ERANCMS 5ft( 1.5m) 5ft( 1.5m) EIft(2.5m) Kv I5ft(4 5m) Avao Avao *MB0 12ft(3.7m) - Figure 4-24. Recommended minimum clearances for tree trimming Only approved tools should be used for tree trimming. A 30-inch (750-millimeter) one-man crosscut saw, docking saw, forester saw, or pruning saw is used for cutting off any limbs within arm’s reach."
+      },
+      {
+        "id": "S2",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS & TECHNIQUES Volume 3-25 DOBLE TESTING OF COUPLING",
+        "pages": "25-27",
+        "text": "B2 will be found grounded if the capacitor is used only with a potential device. 5. Test as follows: To Measure Energize Ground Guard UST C(T2-T1) B1 =T2 T1 B3 ** - C(B1-B3) B1 = T2 T1 - B3 C(B1-B2) B1 =T2 T1 - B2 C(B3-B2) B3 * T1 - B2 *Test voltage not to exceed rating of Tap or Auxiliary Capacitor. **To make certain that all the current in the parallel circuit will be subtracted from the meter reading, vary the procedure slightly in that after applying the safety ground and closing the ground switches, disconnect the capacitor from the power line and test C(T2-T1) by energizing T2 and UST T1. (FIST 3-25 6/91) 2 Failures of Pedestal-type (Pin and Cap) Insulators The problem of failure of pedestal-type insulators first appeared on a 34.5-kV bus at a Reclamation substation in 1962. Since that time, similar failures have occurred on 12.47-kV, 34.5-kV, 41.8-kV, and 69­ kV bus Installations at many other locations."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "9-12. Surge bypass resistors.",
+        "pages": "118-119",
+        "text": "Maintenance. If bypass resistors are mounted in air, any accumulation of dust particles between resistance elements should be removed periodically using dry compressed air. Proper clearances must be maintained to allow for free air circulation. GROUNDING Grounding is provided to limit potential (voltage) differences to values that will not cause undue hazards to personnel and equipment. A ground system which provides adequate current-carrying capacity and a low-resistance path to an earthing connection will dissipate, isolate, or disconnect overpotential areas resulting from fault overcurrents or surge overvoltages. A ground path can consist of single or multiple conductors whose connection provides adequate thermal and conductance capacities. The earthing connection is generally a metallic electrode such as a rod, a water pipe, a counterpoise, or a ground grid system installed below grade. - a. Electrode resistance. The resistance of a ground electrode is primarily determined by the earth surrounding the electrode. Test data given in IEEE 142 indicate that about 90 percent of the total resistance of a ground lies within 6 to 10 feet (1.8 to 3 meters) from the electrode."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-35. Overhead conductor sag.",
+        "pages": "48",
+        "text": "Clearances. Minimum clearances that should be maintained between conductors and other objects are contained in the NESC. Conductors can be damaged in many ways, and what appears initially to be superficial damage may in time cause a failure. Carelessness in installation may kink, nick, abrade, or overstress the conductor. Aeolian vibration, galloping, sway oscillation, unbalanced loading, lightning discharges, an d shortcircuit effects can be damaging to conductors in service. Poor connections cannot only cause damage, but are also possible sources of radio or television interference. An infrared scanning system is recommended over visual inspection. Equipment can be operated from the air or from the ground using aircraft or aerial equipment o r vehicularmounted or hand-held devices. a. Damage signs .The following signs indicate that the conductor is probably being damaged. \\- SIGHTINGMARKERS-, Showing position of sighting markers. A TOP Of SIGHTING UARKER I B TOP Of SIGHTING MARKER e C CONDUCTOR’S LOWERMOST POINT D AMOUNT Of EXISTING SAG E AMOUNT OF EXISTING SAC Showing how meosurement i s mode. Figure 4-10. Measuring sag on line conductors a. AdlustIng the markers."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "4-35. Overhead conductor sag.",
+        "pages": "48",
+        "text": "This may not be horizontal. (1) Line conductors. Se e figure 4-10 for primary and secondary line conductor sag measurements. (a) Estimate approximate sag in section and hold marker on each pole. (b) Adjust marker equally on each support until A, B, and C shown in figure 4-10 are in line. (c) Measure distances D and E shown in figure 4-10. If markers were adjusted properly, D and E will be the same, which is the amount of existing sag. (2) Service drop conductors. Se e figure 4-11 for secondary service-drop procedures. (a) Estimate approximate sag in service-drop conductors and hold marker on pole and building. (b) Adjust markers equally at pole and building until A, B, and C are in line. (c) Measure distances D and E. These distances should be equal. This is the amount of existing sag. c. Clearances. Minimum clearances that should be maintained between conductors and other objects are contained in the NESC. Conductors can be damaged in many ways, and what appears initially to be superficial damage may in time cause a failure."
+      }
+    ]
+  }
+]

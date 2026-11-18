@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What is the minimum acceptable dielectric breakdown value for transformer oil?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"minimum acceptable dielectric breakdown voltage transformer oil\"\n}",
+    "result_summary": "5 passages: S1 p.100, S2 p.115, S3 p.115, S4 p.108, S5 p.187",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**The minimum acceptable dielectric breakdown voltage for transformer oil is 22 kV**, tested with the ASTM D 877 method. This comes from US Army TM 5-684, section 7-8. The same section sets the minimum at 26 kV for RTemp and silicone fluids [S1].\n\n**Related limits in the same manual:**\n- **Testing:** the breakdown test is one of the annual checks on the oil. It sits alongside an acidity limit (neutralization number of at most 0.4 for oil) and a color limit (color number of at most 4 for oil). If the oil fails these, more thorough tests follow [S1].\n- **New oil:** the recloser section sets a higher bar for new oil. It should not break down below 26 kV rms across a standard 0.1 in (2.54 mm) gap. A lower value usually means too much moisture, so filter the oil before using it [S2].\n- **Replacing oil:** in reclosers, replace the oil with clean, dry oil if its strength falls below 22 kV rms [S3].\n\nThese limits come from a 1996 US manual based on ANSI/IEEE C57.106 and ASTM D 877 [S1]. Current European practice (for example IEC 60156 for the test method and IEC 60422 for limits on oil in service) uses different electrodes and gaps and sets different thresholds, so the 22 kV figure doesn't carry over. If you work under DIN EN / IEC, check the current standard."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "7-8. Transformer insulating liquids.",
+        "pages": "100",
+        "text": "ANSI/IEEE C57.106 and ASTM D 117 cover acceptance, maintenance, and test requirements. (1) Annual tests. Annual tests determine whether the insulating liquid is in satisfactory condition or whether more comprehensive tests should be made. (a) Dielectric breakdown . The dielectric breakdown voltage test is covered in ASTM D 877. The minimum acceptable breakdown values are 22 kV for oil and 26 kV for RTemp and silicone. (b) Acidity .Theacidity test is covered in ASTM D 1534. This test indicates how much the oil has oxidized. The maximum permissible neutralization number is 0.4 for oil, 0.5 for RTemp, and 0.01 for silicone. (c) Color. The color test is covered in ASTM D contamination. The maximum acceptable “color number” is 4 for oil and 1.5 for RTemp. (2) Comprehensive tests. Comprehensive tests include a power factor test using an ASTM D 924 test cell, and an interfacial tension (IFT) test in accordance with ASTM D 971 or ASTM D 2285. A liquid at 20 degrees C, with a power factor as given in table 7-3, is considered satisfactory."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-19. Automatic circuit reclosers.",
+        "pages": "115",
+        "text": "Field inspection. After installation, a recloser should be carefully inspected at the established interval. An inspection should include examining the bushings for cracks, as well as other items recommended by the manufacturer. Inspect oil-insulated unit tanks for leakage. Record the counter reading. Bypass and isolate the recloser by suitable means, if possible, and perform an operating test. Manually operate the recloser several times to the lockout position, by means of a switch stick or other control. Operating tests can disclose possible troubles and do prevent the accumulation of high-resistance oxides on contact surfaces. -_ d. Maintenance. Give the following items particular attention: (1) Oil-insulated unites . Never assume that new oil is free of moisture. It should be tested for dielectric strength before using, with breakdown across a standard O.l-inc h (2.54-millimeter) gap occurring at not less than 26 kilovolts root mean square (rms), the minimum acceptable dielectric strength for new oil. Breakdown at a lower test voltage usually indicates excessive moisture in the oil. Remove any moisture by filtering before the oil is used."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-19. Automatic circuit reclosers.",
+        "pages": "115",
+        "text": "Breakdown at a lower test voltage usually indicates excessive moisture in the oil. Remove any moisture by filtering before the oil is used. Always test the oil before putting back in service a recloser which has been temporarily removed for repair. Replace with clean dry oil if the dielectric strength of the oil is less than 22 kilovolts rms. by (2) Vacuum interrupting units .Leaks caused excessive mechanical strain ,insufficiently degassed contact materials, or other causes may decrease the unit’s dielectric strength. The dielectric strength of the vacuum gap can be tested with a 60-hertz high-potential recommended voltage. test at th emanufacturer’s (a) Adjust vacuum contacts for proper contact opening travel, contact closing overtravel, and contact closing force, according to the manufacturer’s recommended procedure. (b) X-radiat’ionmay be produced when vacuum interrupters are energized above maximum rated voltage. Follow the manufacturer’s required precautions. (3) Units insulate dwith SF, gas. Follow the manufacturer’s recommendations as to the insulating medium treatment. (4) Tests. Te ts in accordance with the limits set by the manufacturer and in accordance with ANSI/IEEE C37.60. (a) Insulation ."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "8-14. Maintenance of nonmetalcla d switchgear circuit breakers.",
+        "pages": "108",
+        "text": "Tripping and closing voltages should be recorded on the master record, so subsequent tests can be performed under comparable conditions. Time-travel records are taken on the middle pole from the operating mechanism. (10) Check the air system of a pneumatic mechanism for leaks. (11) Check control wiring for loose connections. (12) Check the settings of compressor switches, low pressure alarms, and cut-off switches. (13) Inspect and check the operating mechanism. Lubricate all pins, bearings, and latches, using the recommended lubricant. b. External inspection guidelines specific to the insulating medium used . Oil dielectric tests are needed for oil circuit breakers, and a moisture test should be provided for gas-insulated units. (1) Oil-insulated circuit breakers . Check oil dielectric strength, power factor, acidity, and color. The dielectric strength must be maintained to prevent internal breakdown under voltage surges and to enable the interrupter to function properly. Its action depends upon changing the internal arc path from a fair conductor to a good insulator, in the short interval while the current is passing through zero."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "APPENDIX A",
+        "pages": "187",
+        "text": "ANSI/IEEE C57.96 Guide for Loading Dry-Type Distribution Power Transformers. ANSI/IEEE C57.106 Guide for Acceptance and Maintenance of Insulating Oil in Equipment. ANSI/SIA A92.9 Vehicle-Mounted Elevated and Rotating Aerial Devices. American Society for Testing and Materials (ASTM). 1916 Race Street, Philadelphia, PA 19103-1187 ASTM A 90 Standard Test Method for Weight (Mass) of Coating on Iron and Steel Articles with Zinc or Zinc-Alloy Coatings. ASTM D 117 Standard Guide To Test Methods and Specifications for Electrical Insulating Oils of Petroleum Origin. ASTM D 150 Standard Test Methods for AC Loss Characteristics and Perxnitivity (Dielectric Constant) of Solid Electrical Insulation. ASTM D 178 ASTM D 877 ASTM D 923 ASTM D 924 Standard Specification for Rubber Insulating Matting. Standard Test Method for Dielectric Breakdown Voltage of Insulating Liquids Using Disk Electrodes. Standard Test Method for Sampling Electrical Insulating Liquids. Standard Test Method for Dissipation Factor (or Power Factor) and Relative Permitivity (Dielectric Constant) of Electrical Insulating Liquids."
+      }
+    ]
+  }
+]

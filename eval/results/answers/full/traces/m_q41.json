@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How often should hot sticks be electrically tested?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"hot stick electrical test interval\"\n}",
+    "result_summary": "5 passages: S1 p.80-81, S2 p.47-48, S3 p.10, S4 p.180, S5 p.30",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**Every 2 years for the electrical test, plus an inspection before each use.**\n\n- FIST 4-1B's maintenance schedule says hot sticks need cleaning, inspection and an electrical test: \"Inspect before each use; test every 2 years.\" It cites OSHA 1910.269 and IEEE Std. 978 as the basis [S2].\n- The same schedule says to review the ratings of hot line tools every 5 years [S2].\n- For switch-operating hot sticks in particular: keep them in good condition and store them somewhere dry. Check them for damage and wear, throw away any you're unsure about, and test them under FIST 4-1B section 25, \"Personal Protective Equipment\" [S1].\n\n**Caveat:** This comes from a 2005 US Bureau of Reclamation manual. The OSHA and IEEE references may have been updated since then. If you work under EU or German rules, check the current requirements for live-working tools, such as the relevant DIN EN / IEC standards and your employer's safety rules, before relying on the 2-year interval."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "Appendix C DISCONNECT SWITCH PREVENTIVE MAINTENANCE",
+        "pages": "80-81",
+        "text": "Door and other interlocks Functional test for proper sequence. Switch disconnect studs and finger clusters (if drawout type) Lubricate unless manufacturer’s instruction says not. Cable terminations and connections Clean and inspect for surface tracking; check connections for correct tightness. Meters Check calibration. Fuse clips and fuses Check clips for adequate spring pressure and proper fuse rating. Grounding Check base and operating handle ground connections; see that ground cable is not broken. Potential, current, and control transformers Evaluate and make necessary repairs. Switch operating hot sticks See that switch operating hot sticks are in good condition and are kept in a dry place; inspect hot sticks for damage and deterioration; discard suspect switch operating hot sticks; test hot sticks per requirements under FIST Volume 4-1B, section 25, “Personal Protective Equipment.” References FIST Volume 3-18, Replacing Glaze Burned Insulators"
+      },
+      {
+        "id": "S2",
+        "document": "FIST 4-1B Maintenance Scheduling for Electrical Equipment (US Bureau of Reclamation, 2005)",
+        "section": "23.2 Maintenance Schedule for Ground Connections in",
+        "pages": "47-48",
+        "text": "26 24. Motors (< 500 hp) Motors of this type drive pumps, valves, gates, and fans. They are usually induction motors and are generally less than 500 hp but may be somewhat larger. Critical motors should routinely be tested. Insulation resistance (Megger®) Annually FIST Volume 3-4, 2.2 Infrared scan Annually NFPA 70B, 20-17.5 Personal protective equipment is used by maintenance workers to provide protection from hazardous electrical energy. Integrity of this equipment is paramount, so maintenance should be scheduled and accomplished similar to equipment maintenance. Hot Line Tools Review equipment ratings 5 years NERC Planning Standard FAC-009-1 Safety ground - visual inspection Annually and before each use NFPA 70E, 130.7 FIST Volume 5-1 Safety ground - millivolt drop test Annually FIST Volume 5-1 Hot stick cleaning, inspection, and electrical test Inspect before each use; test every 2 years OSHA 1910.269J(iii) IEEE Std. 978 Gloves, sleeves, blankets tests Annually Manufacturer’s instruction manuals NFPA 70E, 130.7 IEEE 978"
+      },
+      {
+        "id": "S3",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "ELECTRIC UTILITY METHODS REPORT",
+        "pages": "10",
+        "text": "In most cases three terminals of the wye-connected winding must be tied together to gel sufficient meter deflection. Use of a hot stick, rather than a knife switch or similar low-voltage device, is recommended to make anti break the circuit because considerable voltage and a rather long arc are generated when the circuit is broken. With careful attention It/ making the lest connections, it is possible also Itl check the line and polarizing circuits separately if the circuit from the transformer to the OCB, as shown, cannot be completed conveniently. Correctness of connections for current polarized directional ground relays may be checked easily with a low-voltage, dc-test method devised al Kansas gas & Electric Co. It replaces the procedure of carefully tracing wires and connecting the relay, then hoping for the best. The new method also is simpler than the elaborate and clumsy approach, sometimes used for circulating primary current of proper magnitude to operate the relays."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "16-8. Instrument requirements for checking",
+        "pages": "180",
+        "text": "Useful accessory . A small neon lamp, taped to the end of a hot stick, is a useful accessory to probe for defective insulators and bushings. Use a NE 30 or 32 lamp with the base and resistor removed. The short wires coming out of the glass bulb should be extended in a manner similar to a television set’s dipole antenna rod. Each wire should be about 0.75 inch (19 millimeters) in length. The lamp will glow within 3 to 4 feet (0.9 to 1.2 meters) of a defective insulator or bushing, depending on the severity of the interference signal. A good insulator will show no indication at from 6 to 8 inche s (153 to 240 millimeters). These distances will vary with line voltage as well as with the individual lamp used. Loose or corroded insulators and conductor or tap connections are the major abnormal conditions occurring in power systems that cause disturbances on communication circuits. These insulator or connection conditions cause high-voltage series type power arcs on primary feeders."
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-34. Bushing power factor tests.",
+        "pages": "30",
+        "text": "Figure 3-2 shows connections for hot- and cold-collar tests. - (1) Hot-collar test . This test is performed by grounding the central conductor and the mounting flange and applying test voltage to the collar on the bushing. When hot-collar losses are found to be high because of high relative humidity creating surface leakage, the bushing should be cleaned. Furniture or floor wax should be applied with a clea n lintless cloth. The wax should dry for 5 minutes and then be rubbed briskly with a clean cloth to obtain a high polish. (2) Cold-collar test . This test is performed by grounding the collar and mounting flange and applying test voltage to the central conductor of the bushing. The difference between the overall watt loss and the cold-collar loss is known as watts difference. In general, there appears to be no advantage in the cold-collar test. The hot-collar test is recommended. j. Interpretation of power factor test results."
+      }
+    ]
+  }
+]

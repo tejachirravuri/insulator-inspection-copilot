@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "How often should instrument transformers be scheduled for a maintenance inspection?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"instrument transformers maintenance inspection interval frequency\"\n}",
+    "result_summary": "5 passages: S1 p.95, S2 p.184-185, S3 p.25-26, S4 p.18-19, S5 p.26",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "Under US Army TM 5-684 (1996), you should **schedule a maintenance inspection of instrument transformers every 2 years** [S3]. You should also:\n\n- **Inspect them visually** whenever you inspect the equipment they're connected to, and **at least every 6 months** [S3].\n- **De-energize and fully isolate them before any maintenance.** In polyphase circuits, disconnect all phases so the transformers can't be energized through connected secondaries [S3], [S5].\n\nThese intervals are a starting point for normal conditions. Inspect more often where conditions are harsh. Only stretch the intervals if experience under better-than-normal conditions shows that's safe [S4].\n\nThe two maintenance visits should cover [S5]:\n- **Case:** check for corrosion and leaks. Replace any unit that leaks.\n- **Conduit and connections:** tighten loose joints and bolted connections.\n- **Wiring, grounding and shorting connections:** confirm they make good contact.\n- **Bushings, terminals and fuses:** maintain them as described in the manual.\n\n**Safety note:** never open the secondary of a current transformer while its primary is energized, unless the terminals are the short-circuiting type. An open secondary can produce dangerous voltages [S3].\n\nThis is a 1996 US military manual. Check your utility's own procedures, the manufacturer's recommendations and current standards such as DIN EN / IEC, which may set different intervals."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II-MAINTENANCE 7-4. Transformer inspection and maintenance",
+        "pages": "95",
+        "text": "Annually Annually From 3 to 6 years From 3 to 6 years From 3 to 6 years Annually Gas analysis Dielectric strength Color Acidity (neutralization number) Interfacial tension (IFT) General inspection items Power factor test Annually Annually Annually Annually From 3 to 6 years Frequency From 3 to 6 years clamp-on ammeter. Reasonable accuracy and complete safety should be of the greatest importance in making transformer load surveys. Readings should be taken on the secondary side of the transformer whenever possible. Testing all transformers may not be necessary, because similar areas and buildings may have quite similar loads. (2) Dielectrictests. Dielectric tests of liquid - immersed transformers need not be made on distribution transformers of less than l00-kVA capacity. Liquid samples should be taken a t 5-year intervals from each liquid-immersed distribution transformer of 100-kVA and greater capacity. These samples should be given a dielectric test. If a liquidimmersed transformer has been out of service for one year or more, dielectrically test a liquid sample from that unit before re-energizing the transformer."
+      },
+      {
+        "id": "S2",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II-SCHEDULES",
+        "pages": "184-185",
+        "text": "Table 17-l. Maintenance Frequencies (continued) a ti .I-! *s4% X X X X X X X X X x x x x x x x x Equipment Switch, time (accuracy) Switch, time (contacts) Tap changer, load Telephone interference Terminations Test instrument calibrations, analog Test instrument calibrations, other Tools, live-line inspection Tools, live-line test records Transformer, constant current Transformer, distribution Transformer, instrumen t Transformer, power Tree trimming 6-8.a 6-8.a Table 7-l 2-4.b 2-4.b 15-17.b 15-17.a 6-15.a 7-4.b 3-29. 3-30 7-4.a 4-57.c TM 5-684/NAVFAC MO-200/AFJMAN REFERENCESu iaim 32-1082 - Government Publications Code of Federal Regulations (CFR). Superintendent of Documents, U.S. Government Printing Office, Washington, DC 20402 29 CFR 1910 Occupational Safety and Health, General Industry Standards. 29 CFR 1926 Occupational Safety and Health, Safety and Health Regulations for Construction. Department of the Army, Navy, and Air Force. TM 5-682 Facilities TM 5-683/NAVFAC Electrical MO-ll6/AFJMAN 32-1083 TM 5-8 ll- l/AFJMAN Electrical 32-1080 TM 5-811-7 Electrical NAVFAC MO-202 Overhead NAVFAC P-1060 Electrical AFI 32-1054 Corrosion AFI 32-1078 Electrical AFT0 36C-1-4 Dielectric Engineering, Electrical Facility Safety. Interior Facilities. Power Supply and Distribution. Design, Cathodic Protection."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-28. Short-circuiting dangers.",
+        "pages": "25-26",
+        "text": "A current transformer, being a constant-current device, requires that the secondary circuit always be closed. As long as there is current in the primary winding, there will be current in the secondary winding. On an open circuit the voltage will be the secondary current multiplied by an extremely high open-circuit secondary resistance. This is a voltage which may both damage insulation and prove dangerous to life. Under no circumstances should the secondary of a current transformer be opened while the primary circuit of the transformer is energized, unless the terminals of the current transformer are of th e shortcircuiting type. Instrument transformers should be scheduled for a maintenance inspection every 2 years. In addition, they should be inspected visually any tim e appara3-7 tus with which they are associated is inspected, but not less than every 6 months. a. Safety. Before performing any maintenance on instrument transformers, they must be deenergized and completely isolated from any energized source .Isolation may be accomplished by opening applicable disconnect switches or fuses or by de-energizing appropriate circuit breakers."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "Section II - REQUIREMENTS 2-4. Electric workers, instruments, and reports.",
+        "pages": "18-19",
+        "text": "Calibration should provide the full-scale accuracy based on the manufacturer’s data, usuall y 1 percent for switchboard instruments and 0.25 percent fo r portable instruments. Dated calibration labels should be visible and up-to-date calibration records, instructions, and procedures should be maintained for each instrument which should have had a calibrating standard of higher accuracy than that of the test instrument. ._ c. Test reports. A dated test report should include, as a minimum, the following data: (1) Summary of project findings and recommendations, if required for additional work. (2) Description of equipment tested. (3) Description of test. (4) Test results. The intervals given in this manual and/or by manufacturer’s maintenance recommendations should be considered an initial interval for normal conditions. Intervals should be shortened where adverse conditions exist and may be lengthened only where experience under better-than-normal conditions show this can be done safely. The frequency of inspection may vary for similar equipment operating under different conditions. Critical equipment, heavily loaded apparatus, operator handled, and intermittently operated units are examples of different operating conditions. - - TRANSMISSION AND DISTRIBUTION SUBSTATIONS"
+      },
+      {
+        "id": "S5",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-29. Maintenance of instrument transformers.",
+        "pages": "26",
+        "text": "Safety. Before performing any maintenance on instrument transformers, they must be deenergized and completely isolated from any energized source .Isolation may be accomplished by opening applicable disconnect switches or fuses or by de-energizing appropriate circuit breakers. In polyphase circuits, all phases must be disconnected to ensure that instrument transformers are not energized through interconnected secondaries. Drawout-type voltage transformers, used in metalclad switchgear, should be completely withdrawn for maintenance. b. Procedure. Maintain bushings and terminals of instrument transformers as described in section VII. Maintain fuses, if present, as described in chapter 8, section II. (1) Case. Inspect case or tank for evidence of corrosion and leaks. Clean and paint as required. Instrument transformers that show evidence of leaks should be replaced with those of the same rating and returned to a shop for repair. (2) Conduit and connection . Tighten all loose joints in conduit around fittings, terminal boxes and supporting clamps. Clean and paint corroded areas. Verify tightness of all bolted connections. Verify that wiring, grounding, and shorting connections provide good contact. (3) Drawout mechanisms."
+      }
+    ]
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Insulator Inspection Copilot, an assistant for powerline inspectors. You work with:\n- drone images where YOLOv8 models (fast YOLOv8n / accurate YOLOv8s, chosen automatically) located insulators, and optional condition reviews of the detected crops by a vision model;\n- a knowledge base of US federal maintenance manuals (US Army TM 5-684, 1996; US Bureau of Reclamation FIST volumes 3-18..3-28 and 4-1B, 2000-2005).\n\nRules:\n- Get facts from tools. Never invent counts, confidences, image ids or manual content.\n- When you use manual passages, cite them inline as [S1], [S2] using the ids from search_manuals. Only cite passages that support the sentence.\n- If the manuals do not cover a question, say so plainly. Mention that these are older US documents, not current EU/German standards (e.g. DIN EN / IEC), when that matters.\n- Detection reviews are an AI second opinion; anything flagged needs_human_review must be confirmed by a qualified person. Do not present AI condition calls as certain.\n- Only call review_inspection when the user asks about the condition of an image's insulators and it has no reviews yet: it costs money.\n- Be concise: short paragraphs or bullet points, answer first."
+  },
+  {
+    "role": "user",
+    "content": "What should be done with insulators that have extensive glaze burns?"
+  },
+  {
+    "role": "tool_call",
+    "name": "search_manuals",
+    "content": "{\n  \"query\": \"insulators with extensive glaze burns replace\"\n}",
+    "result_summary": "5 passages: S1 p.4, S2 p.4-6, S3 p.22, S4 p.22, S5 p.4",
+    "is_error": false
+  },
+  {
+    "role": "assistant",
+    "content": "**Replace them right away.** Line and bus insulators with extensive glaze burns should be replaced without delay. They are cheap, and it's uncertain whether a burned insulator can safely stay in service [S5].\n\n**Why:**\n- Large arc burns mean the insulator has been through electrical and thermal stress, which could make it fail completely later [S1].\n- Line suspension insulators damaged by flash burns were checked with the Doble electrical test, and they did not meet the standard for good insulators [S1].\n- Damage may not show. A puncture usually happens under the insulator's head, and only an electrical test (such as Doble) can reliably find it [S1].\n\n**What else the manual says:**\n- **Minor glaze burns** probably have little effect on reliability, but you should still replace those insulators when convenient to remove any doubt [S5].\n- **Chips or broken skirts** on line or bus insulators: take them out of service and scrap them [S5].\n- **Keep a record** of where every flashover happened and how extensive it was [S5].\n- **High-voltage equipment bushings are different.** They can stay in service with small chips or glaze burns if no more than one skirt is damaged and the main porcelain shell has no cracks. The damaged area is cleaned and sealed, with epoxy now used instead of glyptal paint [S2].\n- **Safety:** De-energize the equipment before working on it unless the live-line procedure in the manual is authorized [S4].\n\nThis guidance comes from US Bureau of Reclamation FIST 3-18 (2000) and US Army TM 5-684 (1996). These are older US documents. If you work under current EU/German rules (DIN EN / IEC) or your utility's own procedures, check those as well."
+  },
+  {
+    "role": "sources",
+    "content": [
+      {
+        "id": "S1",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-18 REPLACING GLAZE BURNED INSULATORS",
+        "pages": "4",
+        "text": "Replacing Glaze Burned Insulators It is recommended that damaged or suspected damaged transmission line and station insulators be immediately replaced to reduce the probability of in service failures and subsequent outages. Very few insulators are punctured in service, since a surface flashover usually occurs before puncture. When puncture does occur, it is usually the result of small cracks in porcelain started by cement growth or mechanical or thermal shock. Since a puncture usually occurs under the head of the insulator, there may be no visual evidence of the damage. The only reliable method of detecting the puncture is electrical test. The Doble test method has proven quite reliable. Large arc burns on transmission and bus insulators indicate that the insulators have been subjected to electrical and thermal stress, which could cause complete failure at a later time. A number of trans­ mission line suspension insulators, which had been damaged by flash burns, were tested by the Doble method, and it was found that they did not meet acceptable standards for good insulators."
+      },
+      {
+        "id": "S2",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-18 REPLACING GLAZE BURNED INSULATORS",
+        "pages": "4-6",
+        "text": "However, it is recommended that insulators with such burns be replaced, when convenient, in order to eliminate all doubt. A record should be kept of the location and extent of all flashovers. High-voltage equipment bushings, which do not depend on the bulk porcelain for insulation strength, can be retained in service with small chips or glaze burns provided no more than one skirt is damaged, and there is no evidence of cracks in the main porcelain shell. Such damaged areas, are usually cleaned and painted with glyptal. Since a glyptal finish tends to crack after a prolonged exposure to the elements, epoxy materials have been used for this purpose, or as an adhesive to replace a piece which has broken off. 1 (FIST 3-18 6/91) Correction for Faulty Operation of Mercury Switches For approximately the first two years of operation of the Trinity Plants, problems were experienced with the units tripping off or locking out due to false operation of the mercury switches."
+      },
+      {
+        "id": "S3",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22",
+        "text": "The glossy surface of the glaze makes the insulator surface self-cleaning. Large porcelain insulators are made up of several shapes cemented together. A chemical reaction on the metal parts from improper cementing can result in a cement growth which can be sufficiently stressful to crack the porcelain. (b) Glas sinsulators..Glass insulators are made from a mixture of sand, soda ash, and lime which is mixed and melted in an oven, then molded, cooled, and annealed. (2) Inspection. (a) Look for fractures, chips, deposits of dirt, salt, cement dust, acid fumes, or foreign matter, which under moist conditions may cause a flashover. (b) Check f or cracks in insulators by tapping gently with a small metal object ONLY WHE N DEENERGIZED, about the size of a 6-inch (15 centimeter) wrench. Insulators free of cracks emit a ringing sound when tapped; cracked ones sound dull and hollow. To avoid damaging good insulators, tap them; do not hit them hard. (3) Repair. (a) If the main body of a pin type or post insulator is cracked, replace it immediately."
+      },
+      {
+        "id": "S4",
+        "document": "TM 5-684 Facilities Engineering: Electrical Exterior Facilities (US Army, 1996)",
+        "section": "3-21. Inspection and repair of insulators.",
+        "pages": "22",
+        "text": "This is because the several pieces of porcelain and hardware, assembled in a single unit, are usually located at key positions in the systems, where failure is extremely serious. Switch-and-bus insulator failures occur when porcelain is thrown in tension by any thermal movement between nested parts, which can cause cracking and allow the entrance of moisture. An accumulation of foreign deposits, and mechanical damage from external sources also cause deterioration. Evidence of such impairments may cause a flashover puncture accompanied by a destruction of insulator parts. Workers should be CAUTIONED that equipment must be de-energized unless the procedure in chapter 4, section XV is authorized. a. Ceramic insulators . Ceramic insulators are made of wet-process porcelain or toughened glass. (1) Construction. (a) Porcelain insulators. Porcelain insulators are manufactured from special clays to produce a plastic-like compound which is molded, oven dried, dipped in a colored glazing solution, and fired in a kiln. The glossy surface of the glaze makes the insulator surface self-cleaning. Large porcelain insulators are made up of several shapes cemented together."
+      },
+      {
+        "id": "S5",
+        "document": "FIST Volumes 3-18 to 3-28, Miscellaneous Electrical Volumes II (US Bureau of Reclamation, 2000); includes 3-18 Replacing Glaze Burned Insulators and 3-26 Failures of Pedestal-Type Insulators",
+        "section": "FACILITIES INSTRUCTIONS, STANDARDS, & TECHNIQUES Volume 3-18 REPLACING GLAZE BURNED INSULATORS",
+        "pages": "4",
+        "text": "A number of trans­ mission line suspension insulators, which had been damaged by flash burns, were tested by the Doble method, and it was found that they did not meet acceptable standards for good insulators. In view of the comparatively low cost of line and bus insulators and the uncertainty of retaining burned insulators in service, all insulators with extensive glaze burns should be replaced without delay. Line and bus insulators with chips or broken skirts have been subjected to mechanical stress which may result in future failure. Because of the relatively low cost of such insulators, all insulators with evidence of mechanical damage should be removed from service and junked. Minor glaze burns probably have little effect on the reliability of insulators. However, it is recommended that insulators with such burns be replaced, when convenient, in order to eliminate all doubt. A record should be kept of the location and extent of all flashovers."
+      }
+    ]
+  }
+]
